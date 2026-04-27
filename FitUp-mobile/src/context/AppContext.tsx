@@ -1,0 +1,109 @@
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { load, save, remove, KEYS } from '../storage/storage';
+import { UserProfile, WorkoutEntry, StreakData, Achievement, WorkoutLevel } from '../types';
+import { updateStreak, getDefaultStreak } from '../utils/streak';
+import { generateId } from '../utils/history';
+import { sendAchievementNotification } from '../services/notifications';
+
+type AppState = {
+  profile: UserProfile | null;
+  token: string | null;
+  streak: StreakData;
+  history: WorkoutEntry[];
+  achievements: Achievement[];
+  isLoading: boolean;
+  setProfile: (p: UserProfile) => Promise<void>;
+  setToken: (t: string | null) => Promise<void>;
+  setLevel: (l: WorkoutLevel) => Promise<void>;
+  addWorkoutEntry: (workoutKey: string, workoutLabel: string, durationSeconds: number, exercisesTotal: number) => Promise<void>;
+  logout: () => Promise<void>;
+};
+
+const AppContext = createContext<AppState>({} as AppState);
+
+export function AppProvider({ children }: { children: React.ReactNode }) {
+  const [profile, setProfileState] = useState<UserProfile | null>(null);
+  const [token, setTokenState] = useState<string | null>(null);
+  const [streak, setStreakState] = useState<StreakData>(getDefaultStreak());
+  const [history, setHistoryState] = useState<WorkoutEntry[]>([]);
+  const [achievements, setAchievementsState] = useState<Achievement[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      load<UserProfile>(KEYS.profile),
+      load<string>(KEYS.token),
+      load<StreakData>(KEYS.streak),
+      load<WorkoutEntry[]>(KEYS.history),
+      load<Achievement[]>('@fitup:achievements'),
+    ]).then(([p, t, s, h, a]) => {
+      if (p) setProfileState(p);
+      if (t) setTokenState(t);
+      if (s) setStreakState(s);
+      if (h) setHistoryState(h);
+      if (a) setAchievementsState(a);
+      setIsLoading(false);
+    });
+  }, []);
+
+  const setProfile = useCallback(async (p: UserProfile) => {
+    setProfileState(p);
+    await save(KEYS.profile, p);
+  }, []);
+
+  const setToken = useCallback(async (t: string | null) => {
+    setTokenState(t);
+    if (t) await save(KEYS.token, t);
+    else await remove(KEYS.token);
+  }, []);
+
+  const setLevel = useCallback(async (l: WorkoutLevel) => {
+    if (!profile) return;
+    const updated = { ...profile, level: l };
+    setProfileState(updated);
+    await save(KEYS.profile, updated);
+    await save(KEYS.level, l);
+  }, [profile]);
+
+  const addWorkoutEntry = useCallback(async (
+    workoutKey: string, workoutLabel: string, durationSeconds: number, exercisesTotal: number
+  ) => {
+    const entry: WorkoutEntry = {
+      id: generateId(),
+      workoutKey,
+      workoutLabel,
+      completedAt: new Date().toISOString(),
+      durationSeconds,
+      exercisesTotal,
+    };
+    const newHistory = [...history, entry];
+    setHistoryState(newHistory);
+    await save(KEYS.history, newHistory);
+
+    const { streak: newStreak, newAchievement } = updateStreak(streak);
+    setStreakState(newStreak);
+    await save(KEYS.streak, newStreak);
+
+    if (newAchievement) {
+      const newAchievements = [...achievements, { ...newAchievement, unlockedAt: new Date().toISOString() }];
+      setAchievementsState(newAchievements);
+      await save('@fitup:achievements', newAchievements);
+      await sendAchievementNotification(newAchievement.label, newAchievement.emoji);
+    }
+  }, [history, streak, achievements]);
+
+  const logout = useCallback(async () => {
+    setProfileState(null);
+    setTokenState(null);
+    await remove(KEYS.token);
+    await remove(KEYS.profile);
+  }, []);
+
+  return (
+    <AppContext.Provider value={{ profile, token, streak, history, achievements, isLoading, setProfile, setToken, setLevel, addWorkoutEntry, logout }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export const useApp = () => useContext(AppContext);

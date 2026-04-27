@@ -1,0 +1,194 @@
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Switch, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { useApp } from '../context/AppContext';
+import { calculateBMI, getBMICategory, calculateAge, calculateBMR, calculateIdealWeight } from '../utils/health';
+import { scheduleDailyReminder, cancelAllReminders, requestNotificationPermissions } from '../services/notifications';
+import { save, load, KEYS } from '../storage/storage';
+import { colors, font } from '../theme';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
+
+export default function ProfileScreen({ navigation }: Props) {
+  const { profile, logout, setProfile } = useApp();
+  const insets = useSafeAreaInsets();
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(profile?.name ?? '');
+  const [weight, setWeight] = useState(String(profile?.weightKg ?? ''));
+  const [height, setHeight] = useState(String(profile?.heightCm ?? ''));
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifHour, setNotifHour] = useState(18);
+
+  React.useEffect(() => {
+    load<boolean>(KEYS.notifEnabled).then(v => { if (v !== null) setNotifEnabled(v); });
+    load<number>(KEYS.notifHour).then(v => { if (v !== null) setNotifHour(v); });
+  }, []);
+
+  if (!profile) return null;
+
+  const bmi = calculateBMI(profile.weightKg, profile.heightCm);
+  const bmiCat = getBMICategory(bmi);
+  const age = calculateAge(profile.dateOfBirth);
+  const bmr = calculateBMR(profile.weightKg, profile.heightCm, age, profile.sex);
+  const ideal = calculateIdealWeight(profile.heightCm, profile.sex);
+
+  const handleSave = async () => {
+    const w = parseFloat(weight.replace(',', '.'));
+    const h = parseInt(height, 10);
+    if (!name.trim() || isNaN(w) || isNaN(h)) {
+      Alert.alert('Dados inválidos', 'Verifique os campos antes de salvar.');
+      return;
+    }
+    await setProfile({ ...profile, name: name.trim(), weightKg: w, heightCm: h });
+    setEditing(false);
+  };
+
+  const handleNotifToggle = async (val: boolean) => {
+    setNotifEnabled(val);
+    await save(KEYS.notifEnabled, val);
+    if (val) {
+      const granted = await requestNotificationPermissions();
+      if (granted) await scheduleDailyReminder(notifHour, profile.name);
+    } else {
+      await cancelAllReminders();
+    }
+  };
+
+  const handleLogout = () => {
+    Alert.alert('Sair', 'Tem certeza que deseja sair?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Sair', style: 'destructive', onPress: async () => { await logout(); navigation.reset({ index: 0, routes: [{ name: 'Login' }] }); } },
+    ]);
+  };
+
+  return (
+    <ScrollView style={s.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+      <View style={[s.header, { paddingTop: insets.top + 16 }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
+          <Text style={s.backText}>‹</Text>
+        </TouchableOpacity>
+        <Text style={s.title}>Perfil</Text>
+        <TouchableOpacity onPress={() => editing ? handleSave() : setEditing(true)} style={s.editBtn}>
+          <Text style={s.editText}>{editing ? 'Salvar' : 'Editar'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Avatar */}
+      <View style={s.avatarSection}>
+        <Text style={s.avatar}>👤</Text>
+        {editing
+          ? <TextInput style={s.nameInput} value={name} onChangeText={setName} placeholderTextColor={colors.muted} />
+          : <Text style={s.name}>{profile.name}</Text>
+        }
+        <Text style={s.email}>{profile.email}</Text>
+      </View>
+
+      {/* Metrics */}
+      <Text style={s.sectionLabel}>MÉTRICAS</Text>
+      <View style={s.metricsRow}>
+        <View style={s.metricCard}>
+          {editing
+            ? <TextInput style={s.metricInput} value={weight} onChangeText={setWeight} keyboardType="numeric" placeholderTextColor={colors.muted} />
+            : <Text style={s.metricValue}>{profile.weightKg}kg</Text>
+          }
+          <Text style={s.metricLabel}>Peso</Text>
+        </View>
+        <View style={s.metricCard}>
+          {editing
+            ? <TextInput style={s.metricInput} value={height} onChangeText={setHeight} keyboardType="numeric" placeholderTextColor={colors.muted} />
+            : <Text style={s.metricValue}>{profile.heightCm}cm</Text>
+          }
+          <Text style={s.metricLabel}>Altura</Text>
+        </View>
+        <View style={s.metricCard}>
+          <Text style={s.metricValue}>{age}</Text>
+          <Text style={s.metricLabel}>Anos</Text>
+        </View>
+      </View>
+
+      {/* BMI */}
+      <View style={s.bmiCard}>
+        <View style={s.bmiRow}>
+          <Text style={s.bmiValue}>IMC: <Text style={{ color: bmiCat.color }}>{bmi}</Text></Text>
+          <Text style={[s.bmiLabel, { color: bmiCat.color }]}>{bmiCat.label}</Text>
+        </View>
+        <Text style={s.bmiDesc}>{bmiCat.description}</Text>
+        <View style={s.bmiBarBg}>
+          <View style={[s.bmiBarFill, { width: `${Math.min((bmi / 40) * 100, 100)}%`, backgroundColor: bmiCat.color }]} />
+        </View>
+        <View style={s.bmiExtraRow}>
+          <Text style={s.bmiExtra}>TMB: <Text style={s.bmiExtraVal}>{bmr} kcal/dia</Text></Text>
+          <Text style={s.bmiExtra}>Peso ideal: <Text style={s.bmiExtraVal}>{ideal}kg</Text></Text>
+        </View>
+        <Text style={s.disclaimer}>⚠ Valores de referência. Consulte um profissional de saúde.</Text>
+      </View>
+
+      {/* Notifications */}
+      <Text style={s.sectionLabel}>CONFIGURAÇÕES</Text>
+      <View style={s.settingRow}>
+        <Text style={s.settingLabel}>🔔 Lembretes de treino</Text>
+        <Switch value={notifEnabled} onValueChange={handleNotifToggle} trackColor={{ true: colors.green }} thumbColor={colors.white} />
+      </View>
+      {notifEnabled && (
+        <View style={s.settingRow}>
+          <Text style={s.settingLabel}>⏰ Horário do lembrete</Text>
+          <View style={s.hourRow}>
+            {[7, 12, 18, 20].map(h => (
+              <TouchableOpacity key={h} style={[s.hourBtn, notifHour === h && s.hourBtnActive]}
+                onPress={async () => { setNotifHour(h); await save(KEYS.notifHour, h); if (notifEnabled) await scheduleDailyReminder(h, profile.name); }}>
+                <Text style={[s.hourText, notifHour === h && s.hourTextActive]}>{h}h</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
+      <TouchableOpacity style={s.logoutBtn} onPress={handleLogout}>
+        <Text style={s.logoutText}>Sair da conta</Text>
+      </TouchableOpacity>
+    </ScrollView>
+  );
+}
+
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 16 },
+  backBtn: { marginRight: 12, padding: 4 },
+  backText: { color: colors.white, fontSize: 32, lineHeight: 34 },
+  title: { flex: 1, fontSize: font.xl, fontWeight: '800', color: colors.white },
+  editBtn: { backgroundColor: colors.card, borderRadius: 8, paddingHorizontal: 14, paddingVertical: 6, borderWidth: 1, borderColor: colors.green },
+  editText: { color: colors.green, fontWeight: '700', fontSize: font.sm },
+  avatarSection: { alignItems: 'center', paddingVertical: 20 },
+  avatar: { fontSize: 64, marginBottom: 8 },
+  name: { fontSize: font.xl, fontWeight: '800', color: colors.white },
+  nameInput: { fontSize: font.xl, fontWeight: '800', color: colors.white, borderBottomWidth: 1, borderColor: colors.green, paddingBottom: 4, minWidth: 160, textAlign: 'center' },
+  email: { fontSize: font.sm, color: colors.muted, marginTop: 4 },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: colors.muted, letterSpacing: 1.5, marginHorizontal: 20, marginBottom: 10, marginTop: 8 },
+  metricsRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 14 },
+  metricCard: { flex: 1, backgroundColor: colors.card, borderRadius: 14, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
+  metricValue: { fontSize: font.lg, fontWeight: '800', color: colors.white },
+  metricInput: { fontSize: font.lg, fontWeight: '800', color: colors.white, borderBottomWidth: 1, borderColor: colors.green, width: '100%', textAlign: 'center' },
+  metricLabel: { fontSize: 11, color: colors.muted, marginTop: 4 },
+  bmiCard: { backgroundColor: colors.card, borderRadius: 16, padding: 16, marginHorizontal: 20, marginBottom: 20, borderWidth: 1, borderColor: colors.border },
+  bmiRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+  bmiValue: { fontSize: font.md, fontWeight: '700', color: colors.white },
+  bmiLabel: { fontSize: font.sm, fontWeight: '700' },
+  bmiDesc: { fontSize: font.sm, color: colors.muted, marginBottom: 10 },
+  bmiBarBg: { height: 6, backgroundColor: colors.border, borderRadius: 3, marginBottom: 12 },
+  bmiBarFill: { height: 6, borderRadius: 3 },
+  bmiExtraRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
+  bmiExtra: { fontSize: font.sm, color: colors.muted },
+  bmiExtraVal: { color: colors.white, fontWeight: '600' },
+  disclaimer: { fontSize: 11, color: colors.muted, fontStyle: 'italic' },
+  settingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.card, borderRadius: 12, padding: 16, marginHorizontal: 20, marginBottom: 10, borderWidth: 1, borderColor: colors.border },
+  settingLabel: { fontSize: font.md, color: colors.white },
+  hourRow: { flexDirection: 'row', gap: 8 },
+  hourBtn: { backgroundColor: colors.border, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
+  hourBtnActive: { backgroundColor: colors.green },
+  hourText: { color: colors.muted, fontWeight: '600', fontSize: font.sm },
+  hourTextActive: { color: colors.white },
+  logoutBtn: { marginHorizontal: 20, marginTop: 16, backgroundColor: colors.card, borderRadius: 12, padding: 16, alignItems: 'center', borderWidth: 1, borderColor: '#EF4444' },
+  logoutText: { color: '#EF4444', fontWeight: '700', fontSize: font.md },
+});

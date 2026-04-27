@@ -1,0 +1,69 @@
+import React, { useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
+import { useApp } from '../context/AppContext';
+import { formatDuration } from '../utils/history';
+import { colors, font } from '../theme';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Completion'>;
+
+export default function CompletionScreen({ navigation, route }: Props) {
+  const { workoutKey, workoutLabel, durationSeconds } = route.params;
+  const { addWorkoutEntry, streak } = useApp();
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    addWorkoutEntry(workoutKey, workoutLabel, durationSeconds, 5);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, []);
+
+  return (
+    <View style={[s.container, { paddingBottom: insets.bottom + 24 }]}>
+      <Text style={s.trophy}>🏆</Text>
+      <Text style={s.title}>Parabéns!</Text>
+      <Text style={s.sub}>Você completou o {workoutLabel} com sucesso!</Text>
+
+      <View style={s.statsRow}>
+        {[
+          { label: 'Duração', value: formatDuration(durationSeconds) },
+          { label: 'Streak', value: `🔥 ${streak.current + 1}` },
+          { label: 'Status', value: '✅ Completo' },
+        ].map(({ label, value }) => (
+          <View key={label} style={s.statCard}>
+            <Text style={s.statValue}>{value}</Text>
+            <Text style={s.statLabel}>{label}</Text>
+          </View>
+        ))}
+      </View>
+
+      <Text style={s.motivational}>
+        "Cada treino é um passo a mais na sua jornada. Continue assim! 💪"
+      </Text>
+
+      <TouchableOpacity
+        style={s.btn}
+        onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }] })}
+        accessibilityRole="button"
+      >
+        <Text style={s.btnText}>Finalizar</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  trophy: { fontSize: 80, marginBottom: 16 },
+  title: { fontSize: font.xxl, fontWeight: '900', color: colors.white, marginBottom: 8 },
+  sub: { fontSize: font.md, color: colors.muted, textAlign: 'center', marginBottom: 32 },
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 32 },
+  statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 16, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: colors.green },
+  statValue: { fontSize: font.sm, fontWeight: '700', color: colors.green },
+  statLabel: { fontSize: 11, color: colors.muted, marginTop: 4 },
+  motivational: { fontSize: font.sm, color: colors.muted, textAlign: 'center', fontStyle: 'italic', marginBottom: 40, lineHeight: 22 },
+  btn: { backgroundColor: colors.green, borderRadius: 14, padding: 16, width: '100%', alignItems: 'center' },
+  btnText: { color: colors.white, fontWeight: '700', fontSize: font.lg },
+});
