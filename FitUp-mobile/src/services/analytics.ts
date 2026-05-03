@@ -3,9 +3,18 @@
 
 type EventParams = Record<string, string | number>;
 
+function sanitize(params?: EventParams): EventParams | undefined {
+  if (!params) return undefined;
+  return Object.fromEntries(
+    Object.entries(params).map(([k, v]) =>
+      [k, typeof v === 'string' ? v.replace(/[\r\n]/g, ' ') : v]
+    )
+  );
+}
+
 function logEvent(name: string, params?: EventParams): void {
-  if (__DEV__) console.log(`[Analytics] ${name}`, params);
-  // analytics().logEvent(name, params);
+  if (__DEV__) console.log(`[Analytics] ${name}`, sanitize(params));
+  // analytics().logEvent(name, sanitize(params));
 }
 
 export const Analytics = {

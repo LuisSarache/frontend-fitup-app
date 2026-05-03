@@ -29,7 +29,7 @@ export default function CompletionScreen({ navigation, route }: Props) {
       <View style={s.statsRow}>
         {[
           { label: 'Duração', value: formatDuration(durationSeconds) },
-          { label: 'Streak', value: `🔥 ${streak.current + 1}` },
+          { label: 'Streak', value: `🔥 ${streak.current}` },
           { label: 'Status', value: '✅ Completo' },
         ].map(({ label, value }) => (
           <View key={label} style={s.statCard}>
@@ -50,6 +50,14 @@ export default function CompletionScreen({ navigation, route }: Props) {
       >
         <Text style={s.btnText}>Finalizar</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity
+        style={s.btnSecondary}
+        onPress={() => navigation.reset({ index: 0, routes: [{ name: 'Home' }, { name: 'Progress' }] })}
+        accessibilityRole="button"
+      >
+        <Text style={s.btnSecondaryText}>Ver progresso →</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -64,6 +72,8 @@ const s = StyleSheet.create({
   statValue: { fontSize: font.sm, fontWeight: '700', color: colors.green },
   statLabel: { fontSize: 11, color: colors.muted, marginTop: 4 },
   motivational: { fontSize: font.sm, color: colors.muted, textAlign: 'center', fontStyle: 'italic', marginBottom: 40, lineHeight: 22 },
-  btn: { backgroundColor: colors.green, borderRadius: 14, padding: 16, width: '100%', alignItems: 'center' },
+  btn: { backgroundColor: colors.green, borderRadius: 14, padding: 16, width: '100%', alignItems: 'center', marginBottom: 12 },
   btnText: { color: colors.white, fontWeight: '700', fontSize: font.lg },
+  btnSecondary: { width: '100%', alignItems: 'center', padding: 12 },
+  btnSecondaryText: { color: colors.green, fontWeight: '600', fontSize: font.md },
 });

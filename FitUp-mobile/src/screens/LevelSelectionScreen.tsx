@@ -3,8 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
+import { useApp } from '../context/AppContext';
 import { Analytics } from '../services/analytics';
 import { colors, font } from '../theme';
+import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'LevelSelection'>;
 
@@ -15,15 +17,18 @@ const LEVELS = [
 ] as const;
 
 export default function LevelSelectionScreen({ navigation }: Props) {
+  const { setLevel } = useApp();
   const insets = useSafeAreaInsets();
 
-  const handleSelect = (key: typeof LEVELS[number]['key']) => {
+  const handleSelect = async (key: typeof LEVELS[number]['key']) => {
     Analytics.levelSelected(key);
+    await setLevel(key);
     navigation.navigate('WorkoutSelection', { level: key });
   };
 
   return (
     <View style={[s.container, { paddingTop: insets.top + 24 }]}>
+      <BackButton />
       <Text style={s.title}>Qual é o seu{'\n'}nível atual? 🎯</Text>
       <Text style={s.sub}>Escolha com honestidade para melhores resultados</Text>
 

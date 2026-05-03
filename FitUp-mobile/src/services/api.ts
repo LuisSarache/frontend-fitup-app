@@ -1,10 +1,9 @@
 import axios from 'axios';
-import { load } from '../storage/storage';
-import { KEYS } from '../storage/storage';
+import { load, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
 
 const api = axios.create({
-  baseURL: 'https://api.fitup.app',
+  baseURL: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.fitup.app',
   timeout: 10000,
 });
 
@@ -13,6 +12,24 @@ api.interceptors.request.use(async (config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+// Redireciona para Login automaticamente se o token expirar
+let onUnauthorized: (() => void) | null = null;
+export function setUnauthorizedHandler(handler: () => void) {
+  onUnauthorized = handler;
+}
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error?.response?.status === 401) {
+      await remove(KEYS.token);
+      await remove(KEYS.profile);
+      onUnauthorized?.();
+    }
+    return Promise.reject(error);
+  }
+);
 
 export { withRetry };
 export default api;

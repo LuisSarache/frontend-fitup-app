@@ -38,6 +38,11 @@ export default function SignUpScreen({ navigation }: Props) {
 
   return (
     <View style={[s.container, { paddingTop: insets.top + 24 }]}>
+      <View style={s.stepsRow}>
+        <View style={[s.step, s.stepActive]} />
+        <View style={s.step} />
+      </View>
+      <Text style={s.stepLabel}>Etapa 1 de 2</Text>
       <Text style={s.title}>Criar conta</Text>
       <Text style={s.sub}>Comece sua jornada fitness hoje</Text>
 
@@ -60,6 +65,10 @@ export default function SignUpScreen({ navigation }: Props) {
 }
 
 const s = StyleSheet.create({
+  stepsRow: { flexDirection: 'row', gap: 6, marginBottom: 8 },
+  step: { flex: 1, height: 4, borderRadius: 2, backgroundColor: colors.border },
+  stepActive: { backgroundColor: colors.green },
+  stepLabel: { fontSize: 11, color: colors.muted, marginBottom: 20 },
   container: { flex: 1, backgroundColor: colors.bg, padding: 24, justifyContent: 'center' },
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white, marginBottom: 4 },
   sub: { fontSize: font.md, color: colors.muted, marginBottom: 32 },

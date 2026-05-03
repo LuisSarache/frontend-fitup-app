@@ -6,6 +6,8 @@ import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { groupByDate, formatDuration, getWeekActivity } from '../utils/history';
 import { colors, font } from '../theme';
+import TabBar from '../components/TabBar';
+import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Progress'>;
 
@@ -21,8 +23,10 @@ export default function ProgressScreen({ navigation }: Props) {
     : 0;
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+    <View style={s.container}>
+    <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <View style={[s.header, { paddingTop: insets.top + 16 }]}>
+        <BackButton />
         <Text style={s.title}>Meu Progresso</Text>
       </View>
 
@@ -74,12 +78,14 @@ export default function ProgressScreen({ navigation }: Props) {
         </View>
       ))}
     </ScrollView>
+    <TabBar />
+    </View>
   );
 }
 
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
-  header: { paddingHorizontal: 20, paddingBottom: 20 },
+  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 20 },
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   statsRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 24 },
   statCard: { flex: 1, backgroundColor: colors.card, borderRadius: 14, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: colors.border },

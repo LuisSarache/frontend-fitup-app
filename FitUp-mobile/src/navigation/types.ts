@@ -4,12 +4,14 @@ export type AuthStackParamList = {
   Splash: undefined;
   Login: undefined;
   SignUp: undefined;
+  ForgotPassword: undefined;
 };
 
 export type AppStackParamList = {
   Onboarding: undefined;
   Home: undefined;
   LevelSelection: undefined;
+  ChangeLevel: undefined;
   WorkoutSelection: { level: WorkoutLevel };
   Workout: { workoutKey: string };
   Completion: { workoutKey: string; workoutLabel: string; durationSeconds: number };

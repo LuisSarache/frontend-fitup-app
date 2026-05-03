@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { getWorkoutsByLevel } from '../data/workouts';
 import { colors, font } from '../theme';
+import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WorkoutSelection'>;
 
@@ -18,6 +19,7 @@ export default function WorkoutSelectionScreen({ navigation, route }: Props) {
   return (
     <ScrollView style={s.container} contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
       <View style={{ paddingTop: insets.top + 24 }}>
+        <BackButton />
         <Text style={s.title}>Escolha seu{'\n'}treino de hoje 🏠</Text>
         <Text style={s.sub}>Nível: {levelLabel}</Text>
 

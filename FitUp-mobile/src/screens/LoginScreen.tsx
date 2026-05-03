@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
@@ -35,8 +35,9 @@ export default function LoginScreen({ navigation }: Props) {
     }
   };
 
-  // Dev shortcut — remove when backend is ready
-  const handleDevSkip = () => navigation.replace('Home');
+  const handleSocialLogin = (provider: string) => {
+    Alert.alert('Em breve', `Login com ${provider} estará disponível em breve.`);
+  };
 
   return (
     <View style={[s.container, { paddingTop: insets.top + 24 }]}>
@@ -55,15 +56,15 @@ export default function LoginScreen({ navigation }: Props) {
       </TouchableOpacity>
 
       <Text style={s.or}>— ou continue com —</Text>
-      <TouchableOpacity style={s.social}><Text style={s.socialText}>🇬 Entrar com Google</Text></TouchableOpacity>
-      <TouchableOpacity style={[s.social, { marginTop: 10 }]}><Text style={s.socialText}>📘 Entrar com Facebook</Text></TouchableOpacity>
+      <TouchableOpacity style={s.social} onPress={() => handleSocialLogin('Google')}><Text style={s.socialText}>🇬 Entrar com Google</Text></TouchableOpacity>
+      <TouchableOpacity style={[s.social, { marginTop: 10 }]} onPress={() => handleSocialLogin('Facebook')}><Text style={s.socialText}>📘 Entrar com Facebook</Text></TouchableOpacity>
 
       <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={{ marginTop: 24 }}>
         <Text style={s.link}>Não tem conta? <Text style={{ color: colors.green }}>Cadastre-se</Text></Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleDevSkip} style={{ marginTop: 12 }}>
-        <Text style={[s.link, { color: colors.muted }]}>[Dev] Pular login →</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={{ marginTop: 12 }}>
+        <Text style={s.link}>Esqueceu a senha? <Text style={{ color: colors.green }}>Recuperar</Text></Text>
       </TouchableOpacity>
     </View>
   );

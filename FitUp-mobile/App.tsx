@@ -1,11 +1,12 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect, useRef } from 'react';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import { AppProvider } from './src/context/AppContext';
 import { RootStackParamList } from './src/navigation/types';
+import { setUnauthorizedHandler } from './src/services/api';
 
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -19,14 +20,24 @@ import HomeScreen from './src/screens/HomeScreen';
 import ProgressScreen from './src/screens/ProgressScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
+import ForgotPasswordScreen from './src/screens/ForgotPasswordScreen';
+import ChangeLevelScreen from './src/screens/ChangeLevelScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const navRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      navRef.current?.reset({ index: 0, routes: [{ name: 'Login' }] });
+    });
+  }, []);
+
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <NavigationContainer>
+        <NavigationContainer ref={navRef}>
           <StatusBar style="light" />
           <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
             <Stack.Screen name="Splash" component={SplashScreen} />
@@ -41,6 +52,8 @@ export default function App() {
             <Stack.Screen name="Progress" component={ProgressScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen name="Achievements" component={AchievementsScreen} />
+            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+            <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AppProvider>

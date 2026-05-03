@@ -7,6 +7,7 @@ import { useApp } from '../context/AppContext';
 import { getNextWorkout } from '../data/workouts';
 import { getWeekActivity, getRelativeDate, formatDuration } from '../utils/history';
 import { colors, font } from '../theme';
+import TabBar from '../components/TabBar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
@@ -28,7 +29,8 @@ export default function HomeScreen({ navigation }: Props) {
   };
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
+    <View style={s.container}>
+    <ScrollView contentContainerStyle={{ paddingBottom: 32 }} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={[s.header, { paddingTop: insets.top + 16 }]}>
         <View style={{ flex: 1 }}>
@@ -37,7 +39,7 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={s.streakText}>🔥 Sequência de <Text style={s.streakNum}>{streak.current} dias</Text></Text>
           )}
         </View>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={s.avatarBtn}>
+        <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('Profile')} style={s.avatarBtn}>
           <Text style={s.avatarText}>👤</Text>
         </TouchableOpacity>
       </View>
@@ -106,11 +108,13 @@ export default function HomeScreen({ navigation }: Props) {
         </>
       )}
     </ScrollView>
+    <TabBar />
+    </View>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
+  container: { flex: 1, backgroundColor: colors.bg, flexDirection: 'column' },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 24 },
   greeting: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   streakText: { fontSize: font.sm, color: colors.muted, marginTop: 4 },

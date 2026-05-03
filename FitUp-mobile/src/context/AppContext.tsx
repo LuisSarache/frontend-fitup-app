@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { load, save, remove, KEYS } from '../storage/storage';
 import { UserProfile, WorkoutEntry, StreakData, Achievement, WorkoutLevel } from '../types';
 import { updateStreak, getDefaultStreak } from '../utils/streak';
@@ -101,7 +102,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AppContext.Provider value={{ profile, token, streak, history, achievements, isLoading, setProfile, setToken, setLevel, addWorkoutEntry, logout }}>
-      {children}
+      {isLoading
+        ? <View style={{ flex: 1, backgroundColor: '#0A0F1E', alignItems: 'center', justifyContent: 'center' }}><ActivityIndicator color="#22C55E" size="large" /></View>
+        : children
+      }
     </AppContext.Provider>
   );
 }

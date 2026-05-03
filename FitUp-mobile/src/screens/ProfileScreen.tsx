@@ -8,6 +8,8 @@ import { calculateBMI, getBMICategory, calculateAge, calculateBMR, calculateIdea
 import { scheduleDailyReminder, cancelAllReminders, requestNotificationPermissions } from '../services/notifications';
 import { save, load, KEYS } from '../storage/storage';
 import { colors, font } from '../theme';
+import TabBar from '../components/TabBar';
+import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
 
@@ -64,11 +66,10 @@ export default function ProfileScreen({ navigation }: Props) {
   };
 
   return (
-    <ScrollView style={s.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+    <View style={s.container}>
+    <ScrollView contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
       <View style={[s.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Text style={s.backText}>‹</Text>
-        </TouchableOpacity>
+        <BackButton />
         <Text style={s.title}>Perfil</Text>
         <TouchableOpacity onPress={() => editing ? handleSave() : setEditing(true)} style={s.editBtn}>
           <Text style={s.editText}>{editing ? 'Salvar' : 'Editar'}</Text>
@@ -127,6 +128,10 @@ export default function ProfileScreen({ navigation }: Props) {
 
       {/* Notifications */}
       <Text style={s.sectionLabel}>CONFIGURAÇÕES</Text>
+      <TouchableOpacity style={s.settingRow} onPress={() => navigation.navigate('ChangeLevel')}>
+        <Text style={s.settingLabel}>🎯 Nível de treino</Text>
+        <Text style={s.settingValue}>{profile.level === 'Beginner' ? 'Iniciante' : profile.level === 'Intermediate' ? 'Intermediário' : 'Avançado'} ›</Text>
+      </TouchableOpacity>
       <View style={s.settingRow}>
         <Text style={s.settingLabel}>🔔 Lembretes de treino</Text>
         <Switch value={notifEnabled} onValueChange={handleNotifToggle} trackColor={{ true: colors.green }} thumbColor={colors.white} />
@@ -149,6 +154,8 @@ export default function ProfileScreen({ navigation }: Props) {
         <Text style={s.logoutText}>Sair da conta</Text>
       </TouchableOpacity>
     </ScrollView>
+    <TabBar />
+    </View>
   );
 }
 
@@ -184,6 +191,7 @@ const s = StyleSheet.create({
   disclaimer: { fontSize: 11, color: colors.muted, fontStyle: 'italic' },
   settingRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.card, borderRadius: 12, padding: 16, marginHorizontal: 20, marginBottom: 10, borderWidth: 1, borderColor: colors.border },
   settingLabel: { fontSize: font.md, color: colors.white },
+  settingValue: { fontSize: font.sm, color: colors.green, fontWeight: '600' },
   hourRow: { flexDirection: 'row', gap: 8 },
   hourBtn: { backgroundColor: colors.border, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6 },
   hourBtnActive: { backgroundColor: colors.green },

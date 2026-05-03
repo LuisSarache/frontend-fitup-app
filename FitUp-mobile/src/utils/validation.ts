@@ -1,5 +1,6 @@
 export type FormErrors = {
   name?: string;
+  email?: string;
   weight?: string;
   height?: string;
   dob?: string;
@@ -44,9 +45,15 @@ export function maskDate(value: string): string {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
-export function validateAll(name: string, weight: string, height: string, dob: string): FormErrors {
+export function validateEmail(v: string): string | undefined {
+  if (!v.trim()) return 'E-mail é obrigatório';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return 'E-mail inválido';
+}
+
+export function validateAll(name: string, weight: string, height: string, dob: string, email?: string): FormErrors {
   return {
     name: validateName(name),
+    ...(email !== undefined ? { email: validateEmail(email) } : {}),
     weight: validateWeight(weight),
     height: validateHeight(height),
     dob: validateDob(dob),
