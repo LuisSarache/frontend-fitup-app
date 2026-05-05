@@ -3,7 +3,7 @@ import { load, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
 
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL ?? 'https://api.fitup.app',
+  baseURL: process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8081',
   timeout: 10000,
 });
 

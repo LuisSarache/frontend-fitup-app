@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
+import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -11,14 +12,20 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const isWeb = Platform.OS === 'web';
+
 export async function requestNotificationPermissions(): Promise<boolean> {
-  if (!Device.isDevice) return false;
+  if (isWeb || !Device.isDevice) return false;
+
   const { status } = await Notifications.requestPermissionsAsync();
   return status === 'granted';
 }
 
 export async function scheduleDailyReminder(hour: number, name: string): Promise<void> {
+  if (isWeb) return; // 👈 evita erro
+
   await Notifications.cancelAllScheduledNotificationsAsync();
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Hora de treinar! 💪',
@@ -29,6 +36,8 @@ export async function scheduleDailyReminder(hour: number, name: string): Promise
 }
 
 export async function scheduleStreakRiskReminder(streakDays: number): Promise<void> {
+  if (isWeb) return;
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: 'Seu streak está em risco! 🔥',
@@ -39,6 +48,8 @@ export async function scheduleStreakRiskReminder(streakDays: number): Promise<vo
 }
 
 export async function sendAchievementNotification(label: string, emoji: string): Promise<void> {
+  if (isWeb) return;
+
   await Notifications.scheduleNotificationAsync({
     content: {
       title: `${emoji} Nova conquista desbloqueada!`,
@@ -49,5 +60,7 @@ export async function sendAchievementNotification(label: string, emoji: string):
 }
 
 export async function cancelAllReminders(): Promise<void> {
+  if (isWeb) return;
+
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
