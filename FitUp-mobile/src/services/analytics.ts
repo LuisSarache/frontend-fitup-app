@@ -1,34 +1,74 @@
-// Replace the stub functions below with @react-native-firebase/analytics
-// once google-services.json (Android) and GoogleService-Info.plist (iOS) are configured.
+import { getFirebaseAnalytics, type AnalyticsEventParams } from './firebase';
 
-type EventParams = Record<string, string | number>;
-
-function sanitize(params?: EventParams): EventParams | undefined {
+function sanitize(params?: AnalyticsEventParams): AnalyticsEventParams | undefined {
   if (!params) return undefined;
   return Object.fromEntries(
-    Object.entries(params).map(([k, v]) =>
-      [k, typeof v === 'string' ? v.replace(/[\r\n]/g, ' ') : v]
-    )
+    Object.entries(params).map(([k, v]) => [
+      k,
+      typeof v === 'string' ? v.replace(/[\r\n]/g, ' ') : v,
+    ]),
   );
 }
 
-function logEvent(name: string, params?: EventParams): void {
-  if (__DEV__) console.log(`[Analytics] ${name}`, sanitize(params));
-  // analytics().logEvent(name, sanitize(params));
+function reportError(action: string, error: unknown): void {
+  if (__DEV__) console.warn(`[Analytics] Failed to ${action}`, error);
+}
+
+function logEvent(name: string, params?: AnalyticsEventParams): void {
+  const safeParams = sanitize(params);
+  if (__DEV__) console.log(`[Analytics] ${name}`, safeParams);
+
+  getFirebaseAnalytics()
+    ?.logEvent(name, safeParams)
+    .catch((error) => reportError(`log ${name}`, error));
 }
 
 export const Analytics = {
+  screenViewed: (screenName: string) => {
+    if (__DEV__) console.log(`[Analytics] screen_view`, { screen_name: screenName });
+
+    getFirebaseAnalytics()
+      ?.logScreenView({ screen_name: screenName, screen_class: screenName })
+      .catch((error) => reportError('log screen_view', error));
+  },
+  setCollectionEnabled: (enabled: boolean) => {
+    getFirebaseAnalytics()
+      ?.setAnalyticsCollectionEnabled(enabled)
+      .catch((error) => reportError('set collection enabled', error));
+  },
+  setUserId: (userId: string | null) => {
+    getFirebaseAnalytics()
+      ?.setUserId(userId)
+      .catch((error) => reportError('set user id', error));
+  },
+  setUserLevel: (level: string | null) => {
+    getFirebaseAnalytics()
+      ?.setUserProperty('level', level)
+      .catch((error) => reportError('set user level', error));
+  },
+  reset: () => {
+    getFirebaseAnalytics()
+      ?.resetAnalyticsData()
+      .catch((error) => reportError('reset analytics data', error));
+  },
+  event: logEvent,
   login: (method: string) => logEvent('login', { method }),
   signUp: (method: string) => logEvent('sign_up', { method }),
-  onboardingCompleted: (ageGroup: string) => logEvent('onboarding_completed', { age_group: ageGroup }),
+  onboardingCompleted: (ageGroup: string) =>
+    logEvent('onboarding_completed', { age_group: ageGroup }),
   levelSelected: (level: string) => logEvent('level_selected', { level }),
   workoutStarted: (workoutKey: string) => logEvent('workout_started', { workout_key: workoutKey }),
   workoutCompleted: (workoutKey: string, durationSeconds: number) =>
     logEvent('workout_completed', { workout_key: workoutKey, duration_seconds: durationSeconds }),
   workoutAbandoned: (workoutKey: string, completed: number, total: number) =>
-    logEvent('workout_abandoned', { workout_key: workoutKey, exercises_completed: completed, exercises_total: total }),
+    logEvent('workout_abandoned', {
+      workout_key: workoutKey,
+      exercises_completed: completed,
+      exercises_total: total,
+    }),
   exerciseChecked: (exerciseName: string, workoutKey: string) =>
     logEvent('exercise_checked', { exercise_name: exerciseName, workout_key: workoutKey }),
   streakMilestone: (days: number) => logEvent('streak_milestone', { streak_days: days }),
-  achievementUnlocked: (achievementId: string) => logEvent('achievement_unlocked', { achievement_id: achievementId }),
+  achievementUnlocked: (achievementId: string) =>
+    logEvent('achievement_unlocked', { achievement_id: achievementId }),
 };

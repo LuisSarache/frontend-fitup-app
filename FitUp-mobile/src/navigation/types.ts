@@ -1,3 +1,4 @@
+import { NavigatorScreenParams } from '@react-navigation/native';
 import { WorkoutLevel } from '../types';
 
 export type AuthStackParamList = {
@@ -7,18 +8,26 @@ export type AuthStackParamList = {
   ForgotPassword: undefined;
 };
 
-export type AppStackParamList = {
-  Onboarding: undefined;
+export type MainTabParamList = {
   Home: undefined;
+  Progress: undefined;
+  Achievements: undefined;
+  Profile: undefined;
+};
+
+export type AppStackParamList = {
+  MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
+  Onboarding: undefined;
   LevelSelection: undefined;
   ChangeLevel: undefined;
   WorkoutSelection: { level: WorkoutLevel };
   Workout: { workoutKey: string };
-  Completion: { workoutKey: string; workoutLabel: string; durationSeconds: number };
-  Progress: undefined;
-  Profile: undefined;
-  Achievements: undefined;
+  Completion: {
+    workoutKey: string;
+    workoutLabel: string;
+    durationSeconds: number;
+    exercisesTotal: number;
+  };
 };
 
-// Legacy — kept for backward compat during migration
 export type RootStackParamList = AuthStackParamList & AppStackParamList;

@@ -17,22 +17,24 @@ export default function SplashScreen({ navigation }: Props) {
       Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
       Animated.spring(scale, { toValue: 1, friction: 6, useNativeDriver: true }),
     ]).start();
-  }, []);
+  }, [opacity, scale]);
 
   useEffect(() => {
     if (isLoading) return;
     const t = setTimeout(() => {
-      if (token && profile) navigation.replace('Home');
+      if (token && profile) navigation.replace('MainTabs', { screen: 'Home' });
       else if (token && !profile) navigation.replace('Onboarding');
       else navigation.replace('Login');
     }, 1800);
     return () => clearTimeout(t);
-  }, [isLoading, token, profile]);
+  }, [isLoading, navigation, token, profile]);
 
   return (
     <View style={s.container}>
       <Animated.View style={{ opacity, transform: [{ scale }] }}>
-        <Text style={s.logo}>Fit<Text style={{ color: colors.green }}>Up</Text></Text>
+        <Text style={s.logo}>
+          Fit<Text style={{ color: colors.green }}>Up</Text>
+        </Text>
         <Text style={s.tagline}>Train. Evolve. Repeat.</Text>
       </Animated.View>
     </View>
@@ -40,7 +42,24 @@ export default function SplashScreen({ navigation }: Props) {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg, alignItems: 'center', justifyContent: 'center' },
-  logo: { fontSize: 64, fontWeight: '900', color: colors.white, lineHeight: 68, textAlign: 'center' },
-  tagline: { marginTop: 12, fontSize: font.md, color: colors.muted, letterSpacing: 2, textAlign: 'center' },
+  container: {
+    flex: 1,
+    backgroundColor: colors.bg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  logo: {
+    fontSize: 64,
+    fontWeight: '900',
+    color: colors.white,
+    lineHeight: 68,
+    textAlign: 'center',
+  },
+  tagline: {
+    marginTop: 12,
+    fontSize: font.md,
+    color: colors.muted,
+    letterSpacing: 2,
+    textAlign: 'center',
+  },
 });

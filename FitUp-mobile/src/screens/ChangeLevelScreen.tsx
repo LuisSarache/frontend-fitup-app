@@ -13,7 +13,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ChangeLevel'>;
 const LEVELS: { key: WorkoutLevel; label: string; emoji: string; desc: string }[] = [
   { key: 'Beginner', label: 'Iniciante', emoji: '🌱', desc: 'Nunca treinou ou está voltando' },
   { key: 'Intermediate', label: 'Intermediário', emoji: '🔥', desc: 'Já treina há alguns meses' },
-  { key: 'Advanced', label: 'Avançado', emoji: '⚡', desc: 'Treina consistentemente há mais de 1 ano' },
+  {
+    key: 'Advanced',
+    label: 'Avançado',
+    emoji: '⚡',
+    desc: 'Treina consistentemente há mais de 1 ano',
+  },
 ];
 
 export default function ChangeLevelScreen({ navigation }: Props) {
@@ -21,15 +26,20 @@ export default function ChangeLevelScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
 
   const handleSelect = (key: WorkoutLevel) => {
-    if (key === profile?.level) { navigation.goBack(); return; }
-    Alert.alert(
-      'Mudar nível',
-      `Deseja mudar para ${LEVELS.find(l => l.key === key)?.label}?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Confirmar', onPress: async () => { await setLevel(key); navigation.goBack(); } },
-      ]
-    );
+    if (key === profile?.level) {
+      navigation.goBack();
+      return;
+    }
+    Alert.alert('Mudar nível', `Deseja mudar para ${LEVELS.find((l) => l.key === key)?.label}?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Confirmar',
+        onPress: async () => {
+          await setLevel(key);
+          navigation.goBack();
+        },
+      },
+    ]);
   };
 
   return (
@@ -38,12 +48,19 @@ export default function ChangeLevelScreen({ navigation }: Props) {
         <BackButton />
         <Text style={s.title}>Nível de treino</Text>
       </View>
-      <Text style={s.sub}>Nível atual: <Text style={s.current}>{LEVELS.find(l => l.key === profile?.level)?.label}</Text></Text>
+      <Text style={s.sub}>
+        Nível atual:{' '}
+        <Text style={s.current}>{LEVELS.find((l) => l.key === profile?.level)?.label}</Text>
+      </Text>
 
       {LEVELS.map(({ key, label, emoji, desc }) => {
         const active = profile?.level === key;
         return (
-          <TouchableOpacity key={key} style={[s.card, active && s.cardActive]} onPress={() => handleSelect(key)}>
+          <TouchableOpacity
+            key={key}
+            style={[s.card, active && s.cardActive]}
+            onPress={() => handleSelect(key)}
+          >
             <Text style={s.emoji}>{emoji}</Text>
             <View style={{ flex: 1 }}>
               <Text style={[s.cardTitle, active && s.cardTitleActive]}>{label}</Text>
@@ -63,7 +80,16 @@ const s = StyleSheet.create({
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   sub: { fontSize: font.sm, color: colors.muted, marginBottom: 32 },
   current: { color: colors.green, fontWeight: '700' },
-  card: { backgroundColor: colors.card, borderRadius: 16, padding: 18, flexDirection: 'row', alignItems: 'center', marginBottom: 14, borderWidth: 1, borderColor: colors.border },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   cardActive: { borderColor: colors.green },
   emoji: { fontSize: 28, marginRight: 14 },
   cardTitle: { fontSize: font.lg, fontWeight: '700', color: colors.white },

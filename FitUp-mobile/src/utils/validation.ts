@@ -50,7 +50,13 @@ export function validateEmail(v: string): string | undefined {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())) return 'E-mail inválido';
 }
 
-export function validateAll(name: string, weight: string, height: string, dob: string, email?: string): FormErrors {
+export function validateAll(
+  name: string,
+  weight: string,
+  height: string,
+  dob: string,
+  email?: string,
+): FormErrors {
   return {
     name: validateName(name),
     ...(email !== undefined ? { email: validateEmail(email) } : {}),

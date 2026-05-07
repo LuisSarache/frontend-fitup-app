@@ -1,12 +1,15 @@
 import { WorkoutEntry } from '../types';
 
 export function groupByDate(entries: WorkoutEntry[]): Record<string, WorkoutEntry[]> {
-  return entries.reduce((acc, entry) => {
-    const date = new Date(entry.completedAt).toLocaleDateString('pt-BR');
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(entry);
-    return acc;
-  }, {} as Record<string, WorkoutEntry[]>);
+  return entries.reduce(
+    (acc, entry) => {
+      const date = new Date(entry.completedAt).toLocaleDateString('pt-BR');
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(entry);
+      return acc;
+    },
+    {} as Record<string, WorkoutEntry[]>,
+  );
 }
 
 export function formatDuration(seconds: number): string {
@@ -30,7 +33,7 @@ export function getWeekActivity(entries: WorkoutEntry[]): boolean[] {
     const day = new Date(today);
     day.setDate(today.getDate() - (6 - i));
     const dayStr = day.toDateString();
-    return entries.some(e => new Date(e.completedAt).toDateString() === dayStr);
+    return entries.some((e) => new Date(e.completedAt).toDateString() === dayStr);
   });
 }
 

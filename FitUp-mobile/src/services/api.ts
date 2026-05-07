@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { load, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
+import { getApiBaseUrl } from '../config/env';
 
 const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8081',
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
 });
 
@@ -28,7 +29,7 @@ api.interceptors.response.use(
       onUnauthorized?.();
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export { withRetry };

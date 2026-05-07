@@ -19,7 +19,7 @@ export function useRestTimer(defaultSeconds = 60) {
   useEffect(() => {
     if (!active) return;
     intervalRef.current = setInterval(() => {
-      setSeconds(prev => {
+      setSeconds((prev) => {
         if (prev <= 1) {
           setActive(false);
           return 0;
@@ -27,7 +27,9 @@ export function useRestTimer(defaultSeconds = 60) {
         return prev - 1;
       });
     }, 1000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [active]);
 
   const progress = active && seconds > 0 ? seconds / defaultSeconds : 0;

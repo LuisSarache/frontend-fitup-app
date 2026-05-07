@@ -23,4 +23,5 @@ export const KEYS = {
   onboardingDone: '@fitup:onboarding_done',
   notifHour: '@fitup:notif_hour',
   notifEnabled: '@fitup:notif_enabled',
+  analyticsEnabled: '@fitup:analytics_enabled',
 } as const;

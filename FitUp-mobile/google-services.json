@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "177071854066",
+    "project_id": "fit-up-1fa5d",
+    "storage_bucket": "fit-up-1fa5d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177071854066:android:da8dc53f7981baa28c1b6b",
+        "android_client_info": {
+          "package_name": "com.fitup.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASGJ7E0h67bFMIXA69g3__2cJua23Jkc4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

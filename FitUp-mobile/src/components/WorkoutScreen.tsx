@@ -19,50 +19,69 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const startTime = useRef(Date.now());
   const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const [restTotalSeconds, setRestTotalSeconds] = useState(60);
   const timer = useRestTimer(60);
 
   // Load saved progress
   useEffect(() => {
-    load<Record<string, boolean>>(`${KEYS.workoutProgress}:${workoutKey}`).then(saved => {
+    if (!workout) return;
+
+    load<Record<string, boolean>>(`${KEYS.workoutProgress}:${workoutKey}`).then((saved) => {
       if (saved && Object.keys(saved).length > 0) {
-        Alert.alert(
-          'Continuar treino?',
-          'Você tem progresso salvo neste treino.',
-          [
-            { text: 'Recomeçar', style: 'destructive', onPress: () => remove(`${KEYS.workoutProgress}:${workoutKey}`) },
-            { text: 'Continuar', onPress: () => setChecked(saved) },
-          ]
-        );
+        Alert.alert('Continuar treino?', 'Você tem progresso salvo neste treino.', [
+          {
+            text: 'Recomeçar',
+            style: 'destructive',
+            onPress: () => {
+              setChecked({});
+              remove(`${KEYS.workoutProgress}:${workoutKey}`);
+            },
+          },
+          { text: 'Continuar', onPress: () => setChecked(saved) },
+        ]);
       }
     });
     Analytics.workoutStarted(workoutKey);
     startTime.current = Date.now();
-  }, [workoutKey]);
+  }, [workout, workoutKey]);
 
-  const toggle = useCallback((id: string, name: string, restSeconds: number) => {
-    setChecked(prev => {
-      const newValue = !prev[id];
-      Haptics.impactAsync(newValue ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light);
-      const next = { ...prev, [id]: newValue };
-      save(`${KEYS.workoutProgress}:${workoutKey}`, next);
-      if (newValue) {
-        Analytics.exerciseChecked(name, workoutKey);
-        timer.start(restSeconds);
-      }
-      return next;
-    });
-  }, [workoutKey, timer]);
+  const toggle = useCallback(
+    (id: string, name: string, restSeconds: number) => {
+      setChecked((prev) => {
+        const newValue = !prev[id];
+        Haptics.impactAsync(
+          newValue ? Haptics.ImpactFeedbackStyle.Medium : Haptics.ImpactFeedbackStyle.Light,
+        );
+        const next = { ...prev, [id]: newValue };
+        save(`${KEYS.workoutProgress}:${workoutKey}`, next);
+        if (newValue) {
+          Analytics.exerciseChecked(name, workoutKey);
+          setRestTotalSeconds(restSeconds);
+          timer.start(restSeconds);
+        }
+        return next;
+      });
+    },
+    [workoutKey, timer],
+  );
 
   const completedCount = Object.values(checked).filter(Boolean).length;
-  const total = workout.exercises.length;
+  const total = workout?.exercises.length ?? 0;
   const allDone = completedCount === total;
   const progress = total > 0 ? (completedCount / total) * 100 : 0;
 
   const handleFinish = async () => {
+    if (!workout) return;
+
     const duration = Math.floor((Date.now() - startTime.current) / 1000);
     await remove(`${KEYS.workoutProgress}:${workoutKey}`);
     Analytics.workoutCompleted(workoutKey, duration);
-    navigation.navigate('Completion', { workoutKey, workoutLabel: workout.label, durationSeconds: duration });
+    navigation.navigate('Completion', {
+      workoutKey,
+      workoutLabel: workout.label,
+      durationSeconds: duration,
+      exercisesTotal: total,
+    });
   };
 
   const handleBack = () => {
@@ -70,18 +89,43 @@ export default function WorkoutScreen({ navigation, route }: Props) {
     navigation.goBack();
   };
 
+  if (!workout) {
+    return (
+      <View style={[s.container, { paddingTop: insets.top + 24, paddingHorizontal: 20 }]}>
+        <Text style={s.title}>Treino indisponível</Text>
+        <Text style={s.sub}>Não encontramos esse treino. Volte e escolha outro.</Text>
+        <TouchableOpacity
+          style={s.finishBtn}
+          onPress={() => navigation.goBack()}
+          accessibilityRole="button"
+        >
+          <Text style={s.finishText}>Voltar</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
   return (
     <View style={s.container}>
       <View style={[s.header, { paddingTop: insets.top + 16 }]}>
-        <TouchableOpacity onPress={handleBack} style={s.backBtn} accessibilityLabel="Voltar" accessibilityRole="button">
+        <TouchableOpacity
+          onPress={handleBack}
+          style={s.backBtn}
+          accessibilityLabel="Voltar"
+          accessibilityRole="button"
+        >
           <Text style={s.backText}>‹</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={s.title}>{workout.label}</Text>
-          <Text style={s.sub}>{workout.focus} · ~{workout.durationMinutes}min</Text>
+          <Text style={s.sub}>
+            {workout.focus} · ~{workout.durationMinutes}min
+          </Text>
         </View>
         <View style={s.badge}>
-          <Text style={s.badgeText}>{completedCount}/{total}</Text>
+          <Text style={s.badgeText}>
+            {completedCount}/{total}
+          </Text>
         </View>
       </View>
 
@@ -119,12 +163,18 @@ export default function WorkoutScreen({ navigation, route }: Props) {
       <View style={[s.footer, { paddingBottom: insets.bottom + 12 }]}>
         <TouchableOpacity
           style={[s.finishBtn, !allDone && s.finishBtnDisabled]}
-          onPress={allDone ? handleFinish : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)}
+          onPress={
+            allDone
+              ? handleFinish
+              : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
+          }
           accessibilityRole="button"
           accessibilityState={{ disabled: !allDone }}
         >
           <Text style={s.finishText}>
-            {allDone ? '🎉 Finalizar Treino' : `Complete todos os exercícios (${completedCount}/${total})`}
+            {allDone
+              ? '🎉 Finalizar Treino'
+              : `Complete todos os exercícios (${completedCount}/${total})`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -132,7 +182,7 @@ export default function WorkoutScreen({ navigation, route }: Props) {
       <RestTimerModal
         visible={timer.active}
         seconds={timer.seconds}
-        totalSeconds={60}
+        totalSeconds={restTotalSeconds}
         onSkip={timer.skip}
       />
     </View>
@@ -146,13 +196,46 @@ const s = StyleSheet.create({
   backText: { color: colors.white, fontSize: 32, lineHeight: 34 },
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   sub: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
-  badge: { backgroundColor: colors.card, borderRadius: 20, paddingHorizontal: 12, paddingVertical: 6, borderWidth: 1, borderColor: colors.green },
+  badge: {
+    backgroundColor: colors.card,
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: colors.green,
+  },
   badgeText: { color: colors.green, fontWeight: '700', fontSize: font.sm },
-  progressBg: { height: 4, backgroundColor: colors.card, marginHorizontal: 20, borderRadius: 2, marginBottom: 20 },
+  progressBg: {
+    height: 4,
+    backgroundColor: colors.card,
+    marginHorizontal: 20,
+    borderRadius: 2,
+    marginBottom: 20,
+  },
   progressFill: { height: 4, backgroundColor: colors.green, borderRadius: 2 },
-  card: { backgroundColor: colors.card, borderRadius: 16, padding: 16, marginHorizontal: 20, marginBottom: 12, flexDirection: 'row', alignItems: 'flex-start', borderWidth: 1, borderColor: colors.border },
+  card: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 20,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   cardDone: { borderColor: colors.green, opacity: 0.7 },
-  checkbox: { width: 26, height: 26, borderRadius: 8, borderWidth: 2, borderColor: colors.muted, marginRight: 14, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
+  checkbox: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: colors.muted,
+    marginRight: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
+  },
   checkboxDone: { backgroundColor: colors.green, borderColor: colors.green },
   checkmark: { color: colors.white, fontWeight: '900', fontSize: 14 },
   exName: { fontSize: font.md, fontWeight: '700', color: colors.white },
@@ -160,7 +243,17 @@ const s = StyleSheet.create({
   sets: { fontSize: font.sm, color: colors.green, fontWeight: '600', marginTop: 2 },
   tip: { fontSize: 12, color: colors.muted, marginTop: 4 },
   rest: { fontSize: 11, color: colors.muted, marginTop: 2 },
-  footer: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingTop: 12, backgroundColor: colors.bg, borderTopWidth: 1, borderTopColor: colors.border },
+  footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    backgroundColor: colors.bg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   finishBtn: { backgroundColor: colors.green, borderRadius: 14, padding: 16, alignItems: 'center' },
   finishBtnDisabled: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border },
   finishText: { color: colors.white, fontWeight: '700', fontSize: font.md },

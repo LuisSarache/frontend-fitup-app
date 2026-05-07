@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { KeyboardTypeOptions } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  KeyboardTypeOptions,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,7 +33,7 @@ export default function OnboardingScreen({ navigation }: Props) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  const touch = (field: string) => setTouched(prev => ({ ...prev, [field]: true }));
+  const touch = (field: string) => setTouched((prev) => ({ ...prev, [field]: true }));
 
   const handleContinue = async () => {
     const errs = validateAll(name, weight, height, dob, email);
@@ -63,16 +70,55 @@ export default function OnboardingScreen({ navigation }: Props) {
     navigation.navigate('LevelSelection');
   };
 
-  const fields: { key: keyof FormErrors; label: string; value: string; set: (v: string) => void; placeholder: string; keyboard?: KeyboardTypeOptions; transform?: (v: string) => string }[] = [
+  const fields: {
+    key: keyof FormErrors;
+    label: string;
+    value: string;
+    set: (v: string) => void;
+    placeholder: string;
+    keyboard?: KeyboardTypeOptions;
+    transform?: (v: string) => string;
+  }[] = [
     { key: 'name', label: 'Nome', value: name, set: setName, placeholder: 'Seu nome' },
-    { key: 'email' as any, label: 'E-mail', value: email, set: setEmail, placeholder: 'seu@email.com', keyboard: 'email-address' as KeyboardTypeOptions },
-    { key: 'weight', label: 'Peso (kg)', value: weight, set: setWeight, placeholder: 'Ex: 70', keyboard: 'numeric' },
-    { key: 'height', label: 'Altura (cm)', value: height, set: setHeight, placeholder: 'Ex: 175', keyboard: 'numeric' },
-    { key: 'dob', label: 'Data de Nascimento', value: dob, set: (v) => setDob(maskDate(v)), placeholder: 'DD/MM/AAAA', keyboard: 'numeric' },
+    {
+      key: 'email',
+      label: 'E-mail',
+      value: email,
+      set: setEmail,
+      placeholder: 'seu@email.com',
+      keyboard: 'email-address' as KeyboardTypeOptions,
+    },
+    {
+      key: 'weight',
+      label: 'Peso (kg)',
+      value: weight,
+      set: setWeight,
+      placeholder: 'Ex: 70',
+      keyboard: 'numeric',
+    },
+    {
+      key: 'height',
+      label: 'Altura (cm)',
+      value: height,
+      set: setHeight,
+      placeholder: 'Ex: 175',
+      keyboard: 'numeric',
+    },
+    {
+      key: 'dob',
+      label: 'Data de Nascimento',
+      value: dob,
+      set: (v) => setDob(maskDate(v)),
+      placeholder: 'DD/MM/AAAA',
+      keyboard: 'numeric',
+    },
   ];
 
   return (
-    <ScrollView contentContainerStyle={[s.container, { paddingTop: insets.top + 24 }]} keyboardShouldPersistTaps="handled">
+    <ScrollView
+      contentContainerStyle={[s.container, { paddingTop: insets.top + 24 }]}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={s.stepsRow}>
         <View style={[s.step, s.stepDone]} />
         <View style={[s.step, s.stepActive]} />
@@ -90,7 +136,10 @@ export default function OnboardingScreen({ navigation }: Props) {
             placeholderTextColor={colors.muted}
             value={value}
             onChangeText={set}
-            onBlur={() => { touch(key); setErrors(validateAll(name, weight, height, dob, email)); }}
+            onBlur={() => {
+              touch(key);
+              setErrors(validateAll(name, weight, height, dob, email));
+            }}
             keyboardType={keyboard ?? 'default'}
           />
           {touched[key] && errors[key] && <Text style={s.errorText}>⚠ {errors[key]}</Text>}
@@ -101,9 +150,15 @@ export default function OnboardingScreen({ navigation }: Props) {
       <View style={s.fieldGroup}>
         <Text style={s.label}>Sexo biológico</Text>
         <View style={s.sexRow}>
-          {(['male', 'female'] as const).map(s_ => (
-            <TouchableOpacity key={s_} style={[s.sexBtn, sex === s_ && s.sexBtnActive]} onPress={() => setSex(s_)}>
-              <Text style={[s.sexText, sex === s_ && s.sexTextActive]}>{s_ === 'male' ? '♂ Masculino' : '♀ Feminino'}</Text>
+          {(['male', 'female'] as const).map((s_) => (
+            <TouchableOpacity
+              key={s_}
+              style={[s.sexBtn, sex === s_ && s.sexBtnActive]}
+              onPress={() => setSex(s_)}
+            >
+              <Text style={[s.sexText, sex === s_ && s.sexTextActive]}>
+                {s_ === 'male' ? '♂ Masculino' : '♀ Feminino'}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -123,18 +178,46 @@ const s = StyleSheet.create({
   stepDone: { backgroundColor: colors.greenDim },
   stepLabel: { fontSize: 11, color: colors.muted, marginBottom: 20 },
   container: { flexGrow: 1, backgroundColor: colors.bg, padding: 24 },
-  title: { fontSize: font.xl, fontWeight: '800', color: colors.white, marginBottom: 8, lineHeight: 34 },
+  title: {
+    fontSize: font.xl,
+    fontWeight: '800',
+    color: colors.white,
+    marginBottom: 8,
+    lineHeight: 34,
+  },
   sub: { fontSize: font.sm, color: colors.muted, marginBottom: 32 },
   fieldGroup: { marginBottom: 16 },
   label: { fontSize: font.sm, color: colors.muted, marginBottom: 6 },
-  input: { backgroundColor: colors.card, color: colors.white, borderRadius: 12, padding: 14, fontSize: font.md, borderWidth: 1, borderColor: colors.border },
+  input: {
+    backgroundColor: colors.card,
+    color: colors.white,
+    borderRadius: 12,
+    padding: 14,
+    fontSize: font.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   inputError: { borderColor: '#EF4444' },
   errorText: { color: '#EF4444', fontSize: 12, marginTop: 4 },
   sexRow: { flexDirection: 'row', gap: 10 },
-  sexBtn: { flex: 1, backgroundColor: colors.card, borderRadius: 12, padding: 14, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
+  sexBtn: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
   sexBtnActive: { borderColor: colors.green, backgroundColor: colors.green + '22' },
   sexText: { color: colors.muted, fontWeight: '600', fontSize: font.md },
   sexTextActive: { color: colors.green },
-  btn: { backgroundColor: colors.green, borderRadius: 12, padding: 16, alignItems: 'center', marginTop: 8 },
+  btn: {
+    backgroundColor: colors.green,
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    marginTop: 8,
+  },
   btnText: { color: colors.white, fontWeight: '700', fontSize: font.md },
 });
