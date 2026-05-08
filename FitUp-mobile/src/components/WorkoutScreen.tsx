@@ -13,6 +13,12 @@ import { colors, font } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
 
+function formatElapsedTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
 export default function WorkoutScreen({ navigation, route }: Props) {
   const { workoutKey } = route.params;
   const workout = WORKOUT_MAP[workoutKey];
@@ -20,7 +26,17 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   const startTime = useRef(Date.now());
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [restTotalSeconds, setRestTotalSeconds] = useState(60);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const timer = useRestTimer(60);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTime.current) / 1000));
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   // Load saved progress
   useEffect(() => {
@@ -70,11 +86,10 @@ export default function WorkoutScreen({ navigation, route }: Props) {
   const allDone = completedCount === total;
   const progress = total > 0 ? (completedCount / total) * 100 : 0;
 
-  const handleFinish = async () => {
+  const handleFinish = () => {
     if (!workout) return;
-
     const duration = Math.floor((Date.now() - startTime.current) / 1000);
-    await remove(`${KEYS.workoutProgress}:${workoutKey}`);
+    remove(`${KEYS.workoutProgress}:${workoutKey}`);
     Analytics.workoutCompleted(workoutKey, duration);
     navigation.navigate('Completion', {
       workoutKey,
@@ -119,9 +134,16 @@ export default function WorkoutScreen({ navigation, route }: Props) {
         <View style={{ flex: 1 }}>
           <Text style={s.title}>{workout.label}</Text>
           <Text style={s.sub}>
-            {workout.focus} · ~{workout.durationMinutes}min
+            {workout.focus} · ~{workout.durationMinutes}min · {formatElapsedTime(elapsedSeconds)}
           </Text>
         </View>
+        <TouchableOpacity
+          style={s.pauseBtn}
+          onPress={() => setIsPaused(!isPaused)}
+          activeOpacity={0.7}
+        >
+          <Text style={s.pauseText}>{isPaused ? '▶️' : '⏸️'}</Text>
+        </TouchableOpacity>
         <View style={s.badge}>
           <Text style={s.badgeText}>
             {completedCount}/{total}
@@ -162,19 +184,12 @@ export default function WorkoutScreen({ navigation, route }: Props) {
 
       <View style={[s.footer, { paddingBottom: insets.bottom + 12 }]}>
         <TouchableOpacity
-          style={[s.finishBtn, !allDone && s.finishBtnDisabled]}
-          onPress={
-            allDone
-              ? handleFinish
-              : () => Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning)
-          }
+          style={s.finishBtn}
+          onPress={handleFinish}
           accessibilityRole="button"
-          accessibilityState={{ disabled: !allDone }}
         >
           <Text style={s.finishText}>
-            {allDone
-              ? '🎉 Finalizar Treino'
-              : `Complete todos os exercícios (${completedCount}/${total})`}
+            {allDone ? '🎉 Finalizar Treino' : `Finalizar (${completedCount}/${total})`}
           </Text>
         </TouchableOpacity>
       </View>
@@ -196,6 +211,18 @@ const s = StyleSheet.create({
   backText: { color: colors.white, fontSize: 32, lineHeight: 34 },
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   sub: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
+  pauseBtn: {
+    backgroundColor: colors.card,
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginLeft: 8,
+  },
+  pauseText: { fontSize: 18 },
   badge: {
     backgroundColor: colors.card,
     borderRadius: 20,

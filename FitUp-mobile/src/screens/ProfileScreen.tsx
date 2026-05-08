@@ -43,6 +43,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const [name, setName] = useState(profile?.name ?? '');
   const [weight, setWeight] = useState(String(profile?.weightKg ?? ''));
   const [height, setHeight] = useState(String(profile?.heightCm ?? ''));
+  const [selectedEmoji, setSelectedEmoji] = useState('👤');
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifHour, setNotifHour] = useState(18);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
@@ -137,7 +138,22 @@ export default function ProfileScreen({ navigation }: Props) {
 
         {/* Avatar */}
         <View style={s.avatarSection}>
-          <Text style={s.avatar}>👤</Text>
+          {editing ? (
+            <View style={s.emojiSelector}>
+              {['👤', '💪', '🏋️', '⚡', '🔥', '🏆', '🥇'].map((emoji) => (
+                <TouchableOpacity
+                  key={emoji}
+                  style={[s.emojiBtn, selectedEmoji === emoji && s.emojiBtnActive]}
+                  onPress={() => setSelectedEmoji(emoji)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={s.emojiOption}>{emoji}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ) : (
+            <Text style={s.avatar}>{selectedEmoji}</Text>
+          )}
           {editing ? (
             <TextInput
               style={s.nameInput}
@@ -298,6 +314,28 @@ const s = StyleSheet.create({
   editText: { color: colors.green, fontWeight: '700', fontSize: font.sm },
   avatarSection: { alignItems: 'center', paddingVertical: 20 },
   avatar: { fontSize: 64, marginBottom: 8 },
+  emojiSelector: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  emojiBtn: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
+  emojiBtnActive: {
+    borderColor: colors.green,
+    backgroundColor: colors.green + '22',
+  },
+  emojiOption: { fontSize: 24 },
   name: { fontSize: font.xl, fontWeight: '800', color: colors.white },
   nameInput: {
     fontSize: font.xl,

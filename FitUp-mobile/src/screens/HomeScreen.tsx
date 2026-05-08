@@ -70,8 +70,18 @@ export default function HomeScreen({ navigation }: Props) {
             <Text style={s.sectionAction}>Ver todos</Text>
           </TouchableOpacity>
         </View>
+        
+        <TouchableOpacity
+          style={s.quickStartBtn}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('Workout', { workoutKey: nextWorkout.key })}
+        >
+          <Text style={s.quickStartText}>⚡ Iniciar Treino Rápido</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity
           style={s.nextCard}
+          activeOpacity={0.7}
           onPress={() => navigation.navigate('Workout', { workoutKey: nextWorkout.key })}
         >
           <Text style={s.nextEmoji}>{nextWorkout.emoji}</Text>
@@ -81,9 +91,16 @@ export default function HomeScreen({ navigation }: Props) {
               {nextWorkout.focus} · {nextWorkout.exercises.length} exercícios · ~
               {nextWorkout.durationMinutes}min
             </Text>
-          </View>
-          <View style={s.startBadge}>
-            <Text style={s.startText}>Iniciar</Text>
+            <View style={s.exercisePreview}>
+              {nextWorkout.exercises.slice(0, 3).map((ex, i) => (
+                <Text key={i} style={s.exercisePreviewText}>
+                  • {ex.name}
+                </Text>
+              ))}
+              {nextWorkout.exercises.length > 3 && (
+                <Text style={s.exercisePreviewText}>+ {nextWorkout.exercises.length - 3} mais</Text>
+              )}
+            </View>
           </View>
         </TouchableOpacity>
 
@@ -112,6 +129,7 @@ export default function HomeScreen({ navigation }: Props) {
             <TouchableOpacity
               key={label}
               style={s.statCard}
+              activeOpacity={0.7}
               onPress={() =>
                 label === 'Conquistas'
                   ? navigation.navigate('Achievements')
@@ -138,7 +156,7 @@ export default function HomeScreen({ navigation }: Props) {
                 <Text style={s.recentDate}>{getRelativeDate(entry.completedAt)}</Text>
               </View>
             ))}
-            <TouchableOpacity onPress={() => navigation.navigate('Progress')} style={s.seeAll}>
+            <TouchableOpacity onPress={() => navigation.navigate('Progress')} style={s.seeAll} activeOpacity={0.7}>
               <Text style={s.seeAllText}>Ver histórico completo →</Text>
             </TouchableOpacity>
           </>
@@ -184,20 +202,30 @@ const s = StyleSheet.create({
   },
   sectionLabelFlush: { marginHorizontal: 0, marginBottom: 0, marginTop: 0 },
   sectionAction: { color: colors.green, fontSize: font.sm, fontWeight: '700' },
+  quickStartBtn: {
+    backgroundColor: colors.green,
+    borderRadius: 14,
+    padding: 16,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  quickStartText: { color: colors.white, fontWeight: '800', fontSize: font.lg },
   nextCard: {
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 18,
     marginHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
     borderWidth: 1,
-    borderColor: colors.green,
+    borderColor: colors.border,
     marginBottom: 24,
   },
-  nextEmoji: { fontSize: 32, marginRight: 14 },
+  nextEmoji: { fontSize: 32, marginBottom: 8 },
   nextTitle: { fontSize: font.lg, fontWeight: '700', color: colors.white },
-  nextSub: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
+  nextSub: { fontSize: font.sm, color: colors.muted, marginTop: 2, marginBottom: 8 },
+  exercisePreview: { marginTop: 8, gap: 4 },
+  exercisePreviewText: { fontSize: 12, color: colors.muted },
   startBadge: {
     backgroundColor: colors.green,
     borderRadius: 8,

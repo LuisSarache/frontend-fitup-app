@@ -12,6 +12,9 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { authService } from '../services/auth';
+import api from '../services/api';
+import { env } from '../config/env';
+import { UserProfile } from '../types';
 import { parseApiError } from '../utils/apiErrors';
 import { Analytics } from '../services/analytics';
 import { ErrorMessage } from '../components/ErrorMessage';
@@ -39,7 +42,17 @@ export default function LoginScreen({ navigation }: Props) {
       const token = await authService.login(email.trim(), password);
       await setToken(token);
       Analytics.login('email');
-      if (profile) navigation.replace('MainTabs', { screen: 'Home' });
+      let hasProfile = !!profile;
+      if (!env.useMock) {
+        try {
+          const { data } = await api.get<UserProfile>('/profile');
+          await setProfile(data);
+          hasProfile = true;
+        } catch {
+          hasProfile = false;
+        }
+      }
+      if (hasProfile) navigation.replace('MainTabs', { screen: 'Home' });
       else navigation.replace('Onboarding');
     } catch (err) {
       setError(parseApiError(err));

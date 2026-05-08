@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -12,20 +12,48 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Completion'>;
 
 export default function CompletionScreen({ navigation, route }: Props) {
   const { workoutKey, workoutLabel, durationSeconds, exercisesTotal } = route.params;
-  const { addWorkoutEntry, streak } = useApp();
+  const { addWorkoutEntry, streak, profile } = useApp();
   const insets = useSafeAreaInsets();
   const savedRef = useRef(false);
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const estimatedCalories = Math.round((durationSeconds / 60) * 5 * (profile?.weightKg || 70) * 0.1);
 
   useEffect(() => {
     if (savedRef.current) return;
     savedRef.current = true;
     addWorkoutEntry(workoutKey, workoutLabel, durationSeconds, exercisesTotal);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, [addWorkoutEntry, durationSeconds, exercisesTotal, workoutKey, workoutLabel]);
+    
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [addWorkoutEntry, durationSeconds, exercisesTotal, workoutKey, workoutLabel, scaleAnim, fadeAnim]);
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `🏆 Acabei de completar o ${workoutLabel}!\n⏱️ ${formatDuration(durationSeconds)}\n💪 ${exercisesTotal} exercícios\n🔥 Streak: ${streak.current} dias\n\nTreine comigo no FitUp!`,
+      });
+    } catch {}
+  };
 
   return (
-    <View style={[s.container, { paddingBottom: insets.bottom + 24 }]}>
-      <Text style={s.trophy}>🏆</Text>
+    <Animated.View style={[s.container, { paddingBottom: insets.bottom + 24, opacity: fadeAnim }]}>
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <Text style={s.trophy}>🏆</Text>
+      </Animated.View>
       <Text style={s.title}>Parabéns!</Text>
       <Text style={s.sub}>Você completou o {workoutLabel} com sucesso!</Text>
 
@@ -34,6 +62,7 @@ export default function CompletionScreen({ navigation, route }: Props) {
           { label: 'Duração', value: formatDuration(durationSeconds) },
           { label: 'Streak', value: `🔥 ${streak.current}` },
           { label: 'Exercícios', value: String(exercisesTotal) },
+          { label: 'Calorias', value: `~${estimatedCalories}` },
         ].map(({ label, value }) => (
           <View key={label} style={s.statCard}>
             <Text style={s.statValue}>{value}</Text>
@@ -48,6 +77,7 @@ export default function CompletionScreen({ navigation, route }: Props) {
 
       <TouchableOpacity
         style={s.btn}
+        activeOpacity={0.7}
         onPress={() =>
           navigation.reset({ index: 0, routes: [{ name: 'MainTabs', params: { screen: 'Home' } }] })
         }
@@ -58,6 +88,16 @@ export default function CompletionScreen({ navigation, route }: Props) {
 
       <TouchableOpacity
         style={s.btnSecondary}
+        activeOpacity={0.7}
+        onPress={handleShare}
+        accessibilityRole="button"
+      >
+        <Text style={s.btnSecondaryText}>📤 Compartilhar conquista</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={s.btnSecondary}
+        activeOpacity={0.7}
         onPress={() =>
           navigation.reset({
             index: 0,
@@ -68,7 +108,7 @@ export default function CompletionScreen({ navigation, route }: Props) {
       >
         <Text style={s.btnSecondaryText}>Ver progresso →</Text>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 }
 
@@ -83,9 +123,9 @@ const s = StyleSheet.create({
   trophy: { fontSize: 80, marginBottom: 16 },
   title: { fontSize: font.xxl, fontWeight: '900', color: colors.white, marginBottom: 8 },
   sub: { fontSize: font.md, color: colors.muted, textAlign: 'center', marginBottom: 32 },
-  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 32 },
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' },
   statCard: {
-    flex: 1,
+    minWidth: '45%',
     backgroundColor: colors.card,
     borderRadius: 16,
     padding: 14,

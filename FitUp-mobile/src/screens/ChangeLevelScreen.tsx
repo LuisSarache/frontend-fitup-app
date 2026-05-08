@@ -25,21 +25,14 @@ export default function ChangeLevelScreen({ navigation }: Props) {
   const { profile, setLevel } = useApp();
   const insets = useSafeAreaInsets();
 
-  const handleSelect = (key: WorkoutLevel) => {
-    if (key === profile?.level) {
+  const handleSelect = async (key: WorkoutLevel) => {
+    if (!profile) return;
+    if (key === profile.level) {
       navigation.goBack();
       return;
     }
-    Alert.alert('Mudar nível', `Deseja mudar para ${LEVELS.find((l) => l.key === key)?.label}?`, [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Confirmar',
-        onPress: async () => {
-          await setLevel(key);
-          navigation.goBack();
-        },
-      },
-    ]);
+    await setLevel(key);
+    navigation.goBack();
   };
 
   return (
@@ -60,6 +53,7 @@ export default function ChangeLevelScreen({ navigation }: Props) {
             key={key}
             style={[s.card, active && s.cardActive]}
             onPress={() => handleSelect(key)}
+            disabled={active}
           >
             <Text style={s.emoji}>{emoji}</Text>
             <View style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { load, remove, KEYS } from '../storage/storage';
+import { load, save, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
 import { getApiBaseUrl } from '../config/env';
 
@@ -14,19 +14,57 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// Redireciona para Login automaticamente se o token expirar
 let onUnauthorized: (() => void) | null = null;
 export function setUnauthorizedHandler(handler: () => void) {
   onUnauthorized = handler;
 }
 
+let isRefreshing = false;
+let refreshQueue: Array<(token: string) => void> = [];
+
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error?.response?.status === 401) {
-      await remove(KEYS.token);
-      await remove(KEYS.profile);
-      onUnauthorized?.();
+    const originalRequest = error.config;
+    if (error?.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          refreshQueue.push((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          });
+        });
+      }
+
+      isRefreshing = true;
+      try {
+        const refreshToken = await load<string>(KEYS.refreshToken);
+        if (!refreshToken) throw new Error('no refresh token');
+
+        const { data } = await axios.post<{ token: string; refreshToken: string }>(
+          `${getApiBaseUrl()}/auth/refresh`,
+          { refreshToken },
+        );
+
+        await save(KEYS.token, data.token);
+        await save(KEYS.refreshToken, data.refreshToken);
+
+        refreshQueue.forEach((cb) => cb(data.token));
+        refreshQueue = [];
+
+        originalRequest.headers.Authorization = `Bearer ${data.token}`;
+        return api(originalRequest);
+      } catch {
+        refreshQueue = [];
+        await remove(KEYS.token);
+        await remove(KEYS.refreshToken);
+        await remove(KEYS.profile);
+        onUnauthorized?.();
+      } finally {
+        isRefreshing = false;
+      }
     }
     return Promise.reject(error);
   },

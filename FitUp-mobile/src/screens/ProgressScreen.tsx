@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { Dumbbell } from 'lucide-react-native';
@@ -16,18 +16,46 @@ const WEEK_LABELS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 export default function ProgressScreen(_props: Props) {
   const { history, streak } = useApp();
   const insets = useSafeAreaInsets();
-  const grouped = groupByDate([...history].reverse());
+  const [filter, setFilter] = useState<'all' | 'week' | 'month'>('all');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
+
+  const filteredHistory = history.filter(entry => {
+    if (filter === 'all') return true;
+    const entryDate = new Date(entry.completedAt);
+    const now = new Date();
+    if (filter === 'week') {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return entryDate >= weekAgo;
+    }
+    if (filter === 'month') {
+      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      return entryDate >= monthAgo;
+    }
+    return true;
+  });
+
+  const grouped = groupByDate([...filteredHistory].reverse());
   const weekActivity = getWeekActivity(history);
   const avgDuration =
-    history.length > 0
-      ? Math.round(history.reduce((s, e) => s + e.durationSeconds, 0) / history.length / 60)
+    filteredHistory.length > 0
+      ? Math.round(filteredHistory.reduce((s, e) => s + e.durationSeconds, 0) / filteredHistory.length / 60)
       : 0;
+  const totalMinutes = Math.round(filteredHistory.reduce((s, e) => s + e.durationSeconds, 0) / 60);
 
   return (
     <View style={s.container}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.green} />
+        }
       >
         <View style={[s.header, { paddingTop: insets.top + 16 }]}>
           <Text style={s.title}>Meu Progresso</Text>
@@ -36,9 +64,10 @@ export default function ProgressScreen(_props: Props) {
         {/* Summary */}
         <View style={s.statsRow}>
           {[
-            { label: 'Treinos', value: String(history.length) },
+            { label: 'Treinos', value: String(filteredHistory.length) },
             { label: 'Streak 🔥', value: String(streak.current) },
             { label: 'Média', value: `${avgDuration}min` },
+            { label: 'Total', value: `${totalMinutes}min` },
           ].map(({ label, value }) => (
             <StatCard
               key={label}
@@ -50,6 +79,19 @@ export default function ProgressScreen(_props: Props) {
         </View>
 
         {/* Week bar chart */}
+        <View style={s.filterRow}>
+          {[{ key: 'all', label: 'Todos' }, { key: 'week', label: 'Última semana' }, { key: 'month', label: 'Último mês' }].map(({ key, label }) => (
+            <TouchableOpacity
+              key={key}
+              style={[s.filterBtn, filter === key && s.filterBtnActive]}
+              onPress={() => setFilter(key as any)}
+              activeOpacity={0.7}
+            >
+              <Text style={[s.filterText, filter === key && s.filterTextActive]}>{label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <Text style={s.sectionLabel}>FREQUÊNCIA SEMANAL</Text>
         <View style={s.chartRow}>
           {WEEK_LABELS.map((label, i) => (
@@ -97,7 +139,35 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 20 },
   title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
-  statsRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 24 },
+  statsRow: { flexDirection: 'row', gap: 10, marginHorizontal: 20, marginBottom: 24, flexWrap: 'wrap' },
+  filterRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginHorizontal: 20,
+    marginBottom: 20,
+  },
+  filterBtn: {
+    flex: 1,
+    backgroundColor: colors.card,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  filterBtnActive: {
+    backgroundColor: colors.green,
+    borderColor: colors.green,
+  },
+  filterText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.muted,
+  },
+  filterTextActive: {
+    color: colors.white,
+  },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',

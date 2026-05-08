@@ -29,11 +29,20 @@ export function getRelativeDate(isoDate: string): string {
 
 export function getWeekActivity(entries: WorkoutEntry[]): boolean[] {
   const today = new Date();
+  const currentDayOfWeek = today.getDay(); // 0=domingo, 6=sábado
+  
   return Array.from({ length: 7 }, (_, i) => {
     const day = new Date(today);
-    day.setDate(today.getDate() - (6 - i));
+    const daysToSubtract = currentDayOfWeek - i;
+    day.setDate(today.getDate() - daysToSubtract);
+    day.setHours(0, 0, 0, 0);
+    
     const dayStr = day.toDateString();
-    return entries.some((e) => new Date(e.completedAt).toDateString() === dayStr);
+    return entries.some((e) => {
+      const entryDate = new Date(e.completedAt);
+      entryDate.setHours(0, 0, 0, 0);
+      return entryDate.toDateString() === dayStr;
+    });
   });
 }
 

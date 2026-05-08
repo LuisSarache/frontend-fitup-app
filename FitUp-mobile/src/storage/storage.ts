@@ -16,6 +16,7 @@ export async function remove(key: string): Promise<void> {
 export const KEYS = {
   profile: '@fitup:profile',
   token: '@fitup:token',
+  refreshToken: '@fitup:refresh_token',
   level: '@fitup:level',
   streak: '@fitup:streak',
   history: '@fitup:history',
