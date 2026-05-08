@@ -1,121 +1,512 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+} from 'react-native';
+
+import { LinearGradient } from 'expo-linear-gradient';
+
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+
 import { MainTabParamList } from '../navigation/types';
+
 import { useApp } from '../context/AppContext';
+
 import { ACHIEVEMENTS } from '../utils/streak';
-import { colors, font } from '../theme';
 
-type Props = BottomTabScreenProps<MainTabParamList, 'Achievements'>;
+type Props = BottomTabScreenProps<
+  MainTabParamList,
+  'Achievements'
+>;
 
-export default function AchievementsScreen(_props: Props) {
-  const { achievements, streak } = useApp();
-  const insets = useSafeAreaInsets();
-  const unlockedIds = new Set(achievements.map((a) => a.id));
+export default function AchievementsScreen(
+  _props: Props
+) {
+  const { achievements, streak } =
+    useApp();
+
+  const insets =
+    useSafeAreaInsets();
+
+  const unlockedIds = new Set(
+    achievements.map((a) => a.id)
+  );
 
   return (
-    <View style={s.container}>
+    <LinearGradient
+      colors={[
+        '#0A0A0A',
+        '#111827',
+        '#0A0A0A',
+      ]}
+      style={s.container}
+    >
       <ScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={
+          false
+        }
+        contentContainerStyle={{
+          paddingBottom:
+            insets.bottom + 40,
+        }}
       >
-        <View style={[s.header, { paddingTop: insets.top + 16 }]}>
-          <View>
-            <Text style={s.title}>Conquistas 🏆</Text>
-            <Text style={s.sub}>
-              {achievements.length}/{ACHIEVEMENTS.length} desbloqueadas
+        {/* HEADER */}
+        <View
+          style={[
+            s.header,
+            {
+              paddingTop:
+                insets.top + 20,
+            },
+          ]}
+        >
+          <Text style={s.title}>
+            Conquistas 🏆
+          </Text>
+
+          <Text style={s.subtitle}>
+            {achievements.length}/
+            {ACHIEVEMENTS.length}{' '}
+            desbloqueadas
+          </Text>
+        </View>
+
+        {/* STREAK CARD */}
+        <LinearGradient
+          colors={[
+            '#22C55E',
+            '#16A34A',
+          ]}
+          style={s.streakCard}
+        >
+          <View style={s.streakEmojiBox}>
+            <Text
+              style={s.streakEmoji}
+            >
+              🔥
             </Text>
           </View>
-        </View>
 
-        <View style={s.streakCard}>
-          <Text style={s.streakEmoji}>🔥</Text>
-          <View>
-            <Text style={s.streakVal}>{streak.current} dias</Text>
-            <Text style={s.streakLabel}>Sequência atual · Melhor: {streak.best} dias</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={s.streakVal}>
+              {streak.current} dias
+            </Text>
+
+            <Text
+              style={s.streakLabel}
+            >
+              Sequência atual
+            </Text>
+
+            <Text
+              style={
+                s.streakBest
+              }
+            >
+              Melhor streak:{' '}
+              {streak.best} dias
+            </Text>
           </View>
-        </View>
+        </LinearGradient>
 
-        <Text style={s.sectionLabel}>TODAS AS CONQUISTAS</Text>
+        {/* SECTION */}
+        <Text style={s.sectionLabel}>
+          TODAS AS CONQUISTAS
+        </Text>
+
         {ACHIEVEMENTS.map((a) => {
-          const unlocked = unlockedIds.has(a.id);
-          const entry = achievements.find((u) => u.id === a.id);
-          const progress = Math.min(streak.current / a.requiredStreak, 1);
+          const unlocked =
+            unlockedIds.has(a.id);
+
+          const entry =
+            achievements.find(
+              (u) => u.id === a.id
+            );
+
+          const progress =
+            Math.min(
+              streak.current /
+                a.requiredStreak,
+              1
+            );
+
           return (
-            <View key={a.id} style={[s.card, !unlocked && s.cardLocked]}>
-              <Text style={[s.emoji, !unlocked && s.emojiLocked]}>{unlocked ? a.emoji : '🔒'}</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={[s.label, !unlocked && s.labelLocked]}>{a.label}</Text>
-                <Text style={s.req}>{a.requiredStreak} dias consecutivos</Text>
-                {!unlocked && (
-                  <View style={s.progressBg}>
-                    <View style={[s.progressFill, { width: `${progress * 100}%` }]} />
-                  </View>
-                )}
-                {unlocked && entry?.unlockedAt && (
-                  <Text style={s.unlockedDate}>
-                    Desbloqueado em {new Date(entry.unlockedAt).toLocaleDateString('pt-BR')}
-                  </Text>
-                )}
+            <View
+              key={a.id}
+              style={[
+                s.card,
+
+                !unlocked &&
+                  s.cardLocked,
+              ]}
+            >
+              {/* ICON */}
+              <View
+                style={[
+                  s.iconWrapper,
+
+                  !unlocked &&
+                    s.iconWrapperLocked,
+                ]}
+              >
+                <Text
+                  style={[
+                    s.emoji,
+
+                    !unlocked &&
+                      s.emojiLocked,
+                  ]}
+                >
+                  {unlocked
+                    ? a.emoji
+                    : '🔒'}
+                </Text>
               </View>
-              {unlocked && <Text style={s.check}>✅</Text>}
+
+              {/* INFO */}
+              <View
+                style={{
+                  flex: 1,
+                }}
+              >
+                <Text
+                  style={[
+                    s.label,
+
+                    !unlocked &&
+                      s.labelLocked,
+                  ]}
+                >
+                  {a.label}
+                </Text>
+
+                <Text style={s.req}>
+                  {
+                    a.requiredStreak
+                  }{' '}
+                  dias consecutivos
+                </Text>
+
+                {!unlocked && (
+                  <>
+                    <View
+                      style={
+                        s.progressBg
+                      }
+                    >
+                      <View
+                        style={[
+                          s.progressFill,
+
+                          {
+                            width: `${
+                              progress *
+                              100
+                            }%`,
+                          },
+                        ]}
+                      />
+                    </View>
+
+                    <Text
+                      style={
+                        s.progressText
+                      }
+                    >
+                      {Math.round(
+                        progress * 100
+                      )}
+                      % concluído
+                    </Text>
+                  </>
+                )}
+
+                {unlocked &&
+                  entry?.unlockedAt && (
+                    <Text
+                      style={
+                        s.unlockedDate
+                      }
+                    >
+                      Desbloqueado em{' '}
+                      {new Date(
+                        entry.unlockedAt
+                      ).toLocaleDateString(
+                        'pt-BR'
+                      )}
+                    </Text>
+                  )}
+              </View>
+
+              {unlocked && (
+                <View
+                  style={s.checkBadge}
+                >
+                  <Text
+                    style={
+                      s.check
+                    }
+                  >
+                    ✓
+                  </Text>
+                </View>
+              )}
             </View>
           );
         })}
       </ScrollView>
-    </View>
+    </LinearGradient>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 8 },
-  title: { fontSize: font.xl, fontWeight: '800', color: colors.white },
-  sub: { fontSize: font.sm, color: colors.muted, marginTop: 4 },
+  container: {
+    flex: 1,
+  },
+
+  header: {
+    paddingHorizontal: 24,
+    marginBottom: 28,
+  },
+
+  title: {
+    color: '#fff',
+
+    fontSize: 34,
+
+    fontWeight: '800',
+  },
+
+  subtitle: {
+    color: '#9CA3AF',
+
+    fontSize: 15,
+
+    marginTop: 8,
+  },
+
   streakCard: {
     flexDirection: 'row',
+
     alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 18,
-    marginHorizontal: 20,
-    marginVertical: 16,
-    borderWidth: 1,
-    borderColor: colors.green,
-    gap: 14,
+
+    marginHorizontal: 24,
+
+    marginBottom: 30,
+
+    borderRadius: 30,
+
+    padding: 24,
+
+    shadowColor: '#22C55E',
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+
+    elevation: 10,
   },
-  streakEmoji: { fontSize: 36 },
-  streakVal: { fontSize: font.xl, fontWeight: '800', color: colors.green },
-  streakLabel: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
+
+  streakEmojiBox: {
+    width: 72,
+    height: 72,
+
+    borderRadius: 24,
+
+    backgroundColor:
+      'rgba(255,255,255,0.18)',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    marginRight: 18,
+  },
+
+  streakEmoji: {
+    fontSize: 38,
+  },
+
+  streakVal: {
+    color: '#fff',
+
+    fontSize: 32,
+
+    fontWeight: '800',
+  },
+
+  streakLabel: {
+    color:
+      'rgba(255,255,255,0.88)',
+
+    fontSize: 14,
+
+    marginTop: 2,
+  },
+
+  streakBest: {
+    color:
+      'rgba(255,255,255,0.75)',
+
+    fontSize: 13,
+
+    marginTop: 6,
+  },
+
   sectionLabel: {
-    fontSize: 11,
+    color: '#9CA3AF',
+
+    fontSize: 12,
+
     fontWeight: '700',
-    color: colors.muted,
+
     letterSpacing: 1.5,
-    marginHorizontal: 20,
-    marginBottom: 12,
+
+    marginHorizontal: 24,
+
+    marginBottom: 16,
   },
+
   card: {
     flexDirection: 'row',
+
     alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    marginHorizontal: 20,
-    marginBottom: 12,
+
+    marginHorizontal: 24,
+
+    marginBottom: 16,
+
+    padding: 18,
+
+    borderRadius: 28,
+
+    backgroundColor:
+      'rgba(255,255,255,0.04)',
+
     borderWidth: 1,
-    borderColor: colors.green,
-    gap: 14,
+
+    borderColor:
+      'rgba(34,197,94,0.24)',
   },
-  cardLocked: { borderColor: colors.border, opacity: 0.6 },
-  emoji: { fontSize: 32 },
-  emojiLocked: { opacity: 0.4 },
-  label: { fontSize: font.md, fontWeight: '700', color: colors.white },
-  labelLocked: { color: colors.muted },
-  req: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
-  progressBg: { height: 4, backgroundColor: colors.border, borderRadius: 2, marginTop: 8 },
-  progressFill: { height: 4, backgroundColor: colors.green, borderRadius: 2 },
-  unlockedDate: { fontSize: 11, color: colors.green, marginTop: 4 },
-  check: { fontSize: 20 },
+
+  cardLocked: {
+    borderColor:
+      'rgba(255,255,255,0.06)',
+
+    opacity: 0.72,
+  },
+
+  iconWrapper: {
+    width: 70,
+    height: 70,
+
+    borderRadius: 22,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    backgroundColor:
+      'rgba(34,197,94,0.14)',
+
+    marginRight: 16,
+  },
+
+  iconWrapperLocked: {
+    backgroundColor:
+      'rgba(255,255,255,0.05)',
+  },
+
+  emoji: {
+    fontSize: 34,
+  },
+
+  emojiLocked: {
+    opacity: 0.45,
+  },
+
+  label: {
+    color: '#fff',
+
+    fontSize: 18,
+
+    fontWeight: '800',
+  },
+
+  labelLocked: {
+    color: '#D1D5DB',
+  },
+
+  req: {
+    color: '#9CA3AF',
+
+    fontSize: 13,
+
+    marginTop: 6,
+  },
+
+  progressBg: {
+    height: 8,
+
+    borderRadius: 999,
+
+    backgroundColor:
+      'rgba(255,255,255,0.08)',
+
+    marginTop: 14,
+
+    overflow: 'hidden',
+  },
+
+  progressFill: {
+    height: '100%',
+
+    borderRadius: 999,
+
+    backgroundColor: '#22C55E',
+  },
+
+  progressText: {
+    color: '#6EE7B7',
+
+    fontSize: 12,
+
+    fontWeight: '700',
+
+    marginTop: 8,
+  },
+
+  unlockedDate: {
+    color: '#4ADE80',
+
+    fontSize: 12,
+
+    marginTop: 10,
+
+    fontWeight: '600',
+  },
+
+  checkBadge: {
+    width: 34,
+    height: 34,
+
+    borderRadius: 999,
+
+    backgroundColor:
+      'rgba(34,197,94,0.18)',
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    marginLeft: 12,
+  },
+
+  check: {
+    color: '#4ADE80',
+
+    fontSize: 18,
+
+    fontWeight: '900',
+  },
 });

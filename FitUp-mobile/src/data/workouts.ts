@@ -1,3 +1,4 @@
+
 import { WorkoutLevel } from '../types';
 
 export type Exercise = {
@@ -15,534 +16,228 @@ export type Workout = {
   emoji: string;
   level: WorkoutLevel;
   durationMinutes: number;
+  color: string;
   exercises: Exercise[];
 };
 
+// 🎨 Cores modernas
+const workoutColors = {
+  Beginner: '#22C55E',
+  Intermediate: '#F59E0B',
+  Advanced: '#EF4444',
+} as const;
+
+// 🛠 Helper exercício
+const ex = (
+  id: string,
+  name: string,
+  sets: string,
+  tip: string,
+  restSeconds: number
+): Exercise => ({
+  id,
+  name,
+  sets,
+  tip,
+  restSeconds,
+});
+
+// 🛠 Helper treino
+const createWorkout = (
+  key: string,
+  label: string,
+  focus: string,
+  emoji: string,
+  level: WorkoutLevel,
+  durationMinutes: number,
+  exercises: Exercise[]
+): Workout => ({
+  key,
+  label,
+  focus,
+  emoji,
+  level,
+  durationMinutes,
+  color: workoutColors[level],
+  exercises,
+});
+
 export const WORKOUTS: Workout[] = [
-  // ─── BEGINNER ───────────────────────────────────────────────
-  {
-    key: 'BegA',
-    label: 'Treino A',
-    focus: 'Peito & Tríceps',
-    emoji: '💪',
-    level: 'Beginner',
-    durationMinutes: 25,
-    exercises: [
-      {
-        id: '1',
-        name: 'Flexão de Braço',
-        sets: '3x10',
-        tip: 'Mantenha o core contraído',
-        restSeconds: 60,
-      },
-      {
-        id: '2',
-        name: 'Tríceps no Banco',
-        sets: '3x12',
-        tip: 'Desça até 90° no cotovelo',
-        restSeconds: 60,
-      },
-      {
-        id: '3',
-        name: 'Flexão Diamante',
-        sets: '3x8',
-        tip: 'Mãos formando um triângulo',
-        restSeconds: 60,
-      },
-      {
-        id: '4',
-        name: 'Flexão Inclinada',
-        sets: '3x10',
-        tip: 'Mãos em superfície elevada',
-        restSeconds: 60,
-      },
-      {
-        id: '5',
-        name: 'Mergulho entre Cadeiras',
-        sets: '3x10',
-        tip: 'Cotovelos apontados para trás',
-        restSeconds: 60,
-      },
-    ],
-  },
-  {
-    key: 'BegB',
-    label: 'Treino B',
-    focus: 'Costas & Bíceps',
-    emoji: '🏋️',
-    level: 'Beginner',
-    durationMinutes: 25,
-    exercises: [
-      {
-        id: '1',
-        name: 'Remada com Mochila',
-        sets: '3x10',
-        tip: 'Puxe o cotovelo para trás',
-        restSeconds: 60,
-      },
-      { id: '2', name: 'Flexão Inversa', sets: '3x8', tip: 'Palmas para cima', restSeconds: 60 },
-      {
-        id: '3',
-        name: 'Rosca com Garrafa',
-        sets: '3x12',
-        tip: 'Mantenha o cotovelo fixo',
-        restSeconds: 60,
-      },
-      {
-        id: '4',
-        name: 'Superman',
-        sets: '3x12',
-        tip: 'Eleve braços e pernas juntos',
-        restSeconds: 45,
-      },
-      {
-        id: '5',
-        name: 'Prancha',
-        sets: '3x30s',
-        tip: 'Core contraído, quadril neutro',
-        restSeconds: 45,
-      },
-    ],
-  },
-  {
-    key: 'BegC',
-    label: 'Treino C',
-    focus: 'Pernas & Core',
-    emoji: '🦵',
-    level: 'Beginner',
-    durationMinutes: 25,
-    exercises: [
-      {
-        id: '1',
-        name: 'Agachamento Livre',
-        sets: '3x15',
-        tip: 'Joelhos alinhados com os pés',
-        restSeconds: 60,
-      },
-      {
-        id: '2',
-        name: 'Avanço',
-        sets: '3x10 cada',
-        tip: 'Tronco ereto, passo largo',
-        restSeconds: 60,
-      },
-      {
-        id: '3',
-        name: 'Elevação de Panturrilha',
-        sets: '3x20',
-        tip: 'Suba na ponta dos pés',
-        restSeconds: 30,
-      },
-      {
-        id: '4',
-        name: 'Abdominal Crunch',
-        sets: '3x15',
-        tip: 'Não puxe o pescoço',
-        restSeconds: 45,
-      },
-      {
-        id: '5',
-        name: 'Prancha Lateral',
-        sets: '3x20s cada',
-        tip: 'Quadril elevado, corpo reto',
-        restSeconds: 45,
-      },
-    ],
-  },
+  // ───────── BEGINNER ─────────
+  createWorkout(
+    'BegA',
+    'Treino A',
+    'Peito & Tríceps',
+    '💪',
+    'Beginner',
+    25,
+    [
+      ex('1', 'Flexão de Braço', '3x10', 'Core contraído', 60),
+      ex('2', 'Tríceps no Banco', '3x12', 'Controle na descida', 60),
+      ex('3', 'Flexão Diamante', '3x8', 'Mãos próximas', 60),
+      ex('4', 'Flexão Inclinada', '3x10', 'Superfície elevada', 60),
+      ex('5', 'Mergulho entre Cadeiras', '3x10', 'Cotovelos para trás', 60),
+    ]
+  ),
 
-  // ─── INTERMEDIATE ────────────────────────────────────────────
-  {
-    key: 'IntA',
-    label: 'Treino A',
-    focus: 'Peito & Tríceps',
-    emoji: '💪',
-    level: 'Intermediate',
-    durationMinutes: 35,
-    exercises: [
-      {
-        id: '1',
-        name: 'Flexão com Palmas Fechadas',
-        sets: '4x12',
-        tip: 'Mãos próximas ao centro',
-        restSeconds: 75,
-      },
-      {
-        id: '2',
-        name: 'Dips entre Cadeiras',
-        sets: '4x10',
-        tip: 'Desça até 90° no cotovelo',
-        restSeconds: 75,
-      },
-      {
-        id: '3',
-        name: 'Flexão Pike',
-        sets: '3x10',
-        tip: 'Quadril elevado, cabeça para baixo',
-        restSeconds: 60,
-      },
-      {
-        id: '4',
-        name: 'Flexão Archer',
-        sets: '3x8 cada',
-        tip: 'Estenda um braço lateralmente',
-        restSeconds: 75,
-      },
-      {
-        id: '5',
-        name: 'Tríceps Testa no Chão',
-        sets: '3x12',
-        tip: 'Cotovelos apontados para frente',
-        restSeconds: 60,
-      },
-    ],
-  },
-  {
-    key: 'IntB',
-    label: 'Treino B',
-    focus: 'Costas & Bíceps',
-    emoji: '🏋️',
-    level: 'Intermediate',
-    durationMinutes: 35,
-    exercises: [
-      {
-        id: '1',
-        name: 'Remada Australiana',
-        sets: '4x10',
-        tip: 'Corpo reto, puxe o peito à barra',
-        restSeconds: 75,
-      },
-      {
-        id: '2',
-        name: 'Flexão Invertida Elevada',
-        sets: '3x8',
-        tip: 'Pés em superfície elevada',
-        restSeconds: 75,
-      },
-      {
-        id: '3',
-        name: 'Isométrico de Bíceps',
-        sets: '3x30s',
-        tip: 'Pressione contra superfície fixa',
-        restSeconds: 45,
-      },
-      {
-        id: '4',
-        name: 'Superman com Rotação',
-        sets: '3x12',
-        tip: 'Gire o tronco no topo',
-        restSeconds: 45,
-      },
-      {
-        id: '5',
-        name: 'Prancha com Toque no Ombro',
-        sets: '3x20',
-        tip: 'Minimize o balanço do quadril',
-        restSeconds: 45,
-      },
-    ],
-  },
-  {
-    key: 'IntC',
-    label: 'Treino C',
-    focus: 'Pernas & Core',
-    emoji: '🦵',
-    level: 'Intermediate',
-    durationMinutes: 35,
-    exercises: [
-      {
-        id: '1',
-        name: 'Agachamento Búlgaro',
-        sets: '3x10 cada',
-        tip: 'Pé traseiro elevado',
-        restSeconds: 90,
-      },
-      {
-        id: '2',
-        name: 'Avanço com Salto',
-        sets: '3x8 cada',
-        tip: 'Troque as pernas no ar',
-        restSeconds: 75,
-      },
-      {
-        id: '3',
-        name: 'Agachamento Sumô',
-        sets: '3x15',
-        tip: 'Pés afastados, pontas para fora',
-        restSeconds: 60,
-      },
-      {
-        id: '4',
-        name: 'Prancha com Toque no Ombro',
-        sets: '3x20',
-        tip: 'Minimize o balanço',
-        restSeconds: 45,
-      },
-      {
-        id: '5',
-        name: 'Mountain Climber',
-        sets: '3x30s',
-        tip: 'Joelhos ao peito alternados',
-        restSeconds: 45,
-      },
-    ],
-  },
-  {
-    key: 'IntD',
-    label: 'Treino D',
-    focus: 'Full Body',
-    emoji: '🔥',
-    level: 'Intermediate',
-    durationMinutes: 30,
-    exercises: [
-      { id: '1', name: 'Burpee', sets: '3x10', tip: 'Explosão na subida', restSeconds: 90 },
-      {
-        id: '2',
-        name: 'Mountain Climber',
-        sets: '3x30s',
-        tip: 'Joelhos ao peito alternados',
-        restSeconds: 60,
-      },
-      {
-        id: '3',
-        name: 'Agachamento com Salto',
-        sets: '3x12',
-        tip: 'Aterrisse suavemente',
-        restSeconds: 75,
-      },
-      {
-        id: '4',
-        name: 'Flexão Explosiva',
-        sets: '3x8',
-        tip: 'Mãos saem do chão no topo',
-        restSeconds: 75,
-      },
-      {
-        id: '5',
-        name: 'Prancha Dinâmica',
-        sets: '3x30s',
-        tip: 'Alterne cotovelo e mão',
-        restSeconds: 45,
-      },
-    ],
-  },
+  createWorkout(
+    'BegB',
+    'Treino B',
+    'Costas & Bíceps',
+    '🏋️',
+    'Beginner',
+    25,
+    [
+      ex('1', 'Remada com Mochila', '3x10', 'Puxe os cotovelos', 60),
+      ex('2', 'Flexão Inversa', '3x8', 'Palmas para cima', 60),
+      ex('3', 'Rosca com Garrafa', '3x12', 'Cotovelos fixos', 60),
+      ex('4', 'Superman', '3x12', 'Eleve braços e pernas', 45),
+      ex('5', 'Prancha', '3x30s', 'Quadril neutro', 45),
+    ]
+  ),
 
-  // ─── ADVANCED ────────────────────────────────────────────────
-  {
-    key: 'AdvA',
-    label: 'Treino A',
-    focus: 'Peito & Tríceps',
-    emoji: '💪',
-    level: 'Advanced',
-    durationMinutes: 45,
-    exercises: [
-      {
-        id: '1',
-        name: 'Flexão com Aplauso',
-        sets: '4x10',
-        tip: 'Explosão máxima na subida',
-        restSeconds: 90,
-      },
-      {
-        id: '2',
-        name: 'Pseudo Planche',
-        sets: '4x8',
-        tip: 'Incline o corpo para frente',
-        restSeconds: 90,
-      },
-      { id: '3', name: 'Dips Profundo', sets: '4x12', tip: 'Desça abaixo de 90°', restSeconds: 90 },
-      {
-        id: '4',
-        name: 'Flexão Archer',
-        sets: '3x8 cada',
-        tip: 'Braço estendido ao lado',
-        restSeconds: 90,
-      },
-      {
-        id: '5',
-        name: 'Pike Push-up',
-        sets: '3x10',
-        tip: 'Simula o press militar',
-        restSeconds: 75,
-      },
-    ],
-  },
-  {
-    key: 'AdvB',
-    label: 'Treino B',
-    focus: 'Costas & Bíceps',
-    emoji: '🏋️',
-    level: 'Advanced',
-    durationMinutes: 45,
-    exercises: [
-      {
-        id: '1',
-        name: 'Remada Australiana Elevada',
-        sets: '4x12',
-        tip: 'Pés em superfície elevada',
-        restSeconds: 90,
-      },
-      {
-        id: '2',
-        name: 'Flexão Invertida Vertical',
-        sets: '4x8',
-        tip: 'Pés na parede, cabeça abaixo',
-        restSeconds: 90,
-      },
-      {
-        id: '3',
-        name: 'Chin-up Assistido',
-        sets: '3x8',
-        tip: 'Use elástico para assistência',
-        restSeconds: 90,
-      },
-      {
-        id: '4',
-        name: 'Remada com Toalha',
-        sets: '3x10',
-        tip: 'Enrole toalha em porta',
-        restSeconds: 75,
-      },
-      {
-        id: '5',
-        name: 'Superman Isométrico',
-        sets: '3x30s',
-        tip: 'Segure no topo',
-        restSeconds: 45,
-      },
-    ],
-  },
-  {
-    key: 'AdvC',
-    label: 'Treino C',
-    focus: 'Pernas & Core',
-    emoji: '🦵',
-    level: 'Advanced',
-    durationMinutes: 45,
-    exercises: [
-      {
-        id: '1',
-        name: 'Pistol Squat Assistido',
-        sets: '3x6 cada',
-        tip: 'Segure em superfície para equilíbrio',
-        restSeconds: 90,
-      },
-      {
-        id: '2',
-        name: 'Nordic Curl',
-        sets: '3x5',
-        tip: 'Desça lentamente, use mãos no fim',
-        restSeconds: 90,
-      },
-      {
-        id: '3',
-        name: 'Dragon Flag',
-        sets: '3x5',
-        tip: 'Corpo reto, desça controlado',
-        restSeconds: 90,
-      },
-      { id: '4', name: 'L-sit', sets: '3x15s', tip: 'Pernas paralelas ao chão', restSeconds: 60 },
-      {
-        id: '5',
-        name: 'Prancha com Elevação',
-        sets: '3x10 cada',
-        tip: 'Eleve braço e perna opostos',
-        restSeconds: 60,
-      },
-    ],
-  },
-  {
-    key: 'AdvD',
-    label: 'Treino D',
-    focus: 'Full Body',
-    emoji: '🔥',
-    level: 'Advanced',
-    durationMinutes: 40,
-    exercises: [
-      {
-        id: '1',
-        name: 'Burpee com Flexão',
-        sets: '4x10',
-        tip: 'Flexão completa no chão',
-        restSeconds: 90,
-      },
-      {
-        id: '2',
-        name: 'Muscle-up Assistido',
-        sets: '3x5',
-        tip: 'Use elástico, explosão na transição',
-        restSeconds: 120,
-      },
-      {
-        id: '3',
-        name: 'Handstand Wall Hold',
-        sets: '3x20s',
-        tip: 'Pés na parede, core contraído',
-        restSeconds: 90,
-      },
-      {
-        id: '4',
-        name: 'Agachamento com Salto',
-        sets: '4x12',
-        tip: 'Aterrisse suavemente',
-        restSeconds: 75,
-      },
-      { id: '5', name: 'Flexão com Aplauso', sets: '3x8', tip: 'Máxima explosão', restSeconds: 90 },
-    ],
-  },
-  {
-    key: 'AdvE',
-    label: 'Treino E',
-    focus: 'Mobilidade',
-    emoji: '🧘',
-    level: 'Advanced',
-    durationMinutes: 30,
-    exercises: [
-      {
-        id: '1',
-        name: 'Hip Flexor Stretch',
-        sets: '3x30s cada',
-        tip: 'Joelho no chão, avance o quadril',
-        restSeconds: 30,
-      },
-      {
-        id: '2',
-        name: 'Thoracic Rotation',
-        sets: '3x10 cada',
-        tip: 'Rotação torácica controlada',
-        restSeconds: 30,
-      },
-      { id: '3', name: 'Pigeon Pose', sets: '3x30s cada', tip: 'Quadril no chão', restSeconds: 30 },
-      {
-        id: '4',
-        name: 'Shoulder Dislocates',
-        sets: '3x10',
-        tip: 'Use bastão ou toalha',
-        restSeconds: 30,
-      },
-      {
-        id: '5',
-        name: 'Deep Squat Hold',
-        sets: '3x30s',
-        tip: 'Calcanhares no chão',
-        restSeconds: 30,
-      },
-    ],
-  },
+  createWorkout(
+    'BegC',
+    'Treino C',
+    'Pernas & Core',
+    '🦵',
+    'Beginner',
+    25,
+    [
+      ex('1', 'Agachamento Livre', '3x15', 'Joelhos alinhados', 60),
+      ex('2', 'Avanço', '3x10 cada', 'Tronco reto', 60),
+      ex('3', 'Panturrilha', '3x20', 'Suba lentamente', 30),
+      ex('4', 'Abdominal Crunch', '3x15', 'Não force o pescoço', 45),
+      ex('5', 'Prancha Lateral', '3x20s', 'Quadril elevado', 45),
+    ]
+  ),
+
+  // ───────── INTERMEDIATE ─────────
+  createWorkout(
+    'IntA',
+    'Treino A',
+    'Peito & Tríceps',
+    '🔥',
+    'Intermediate',
+    35,
+    [
+      ex('1', 'Flexão Pike', '4x10', 'Quadril elevado', 75),
+      ex('2', 'Dips entre Cadeiras', '4x10', 'Desça controlado', 75),
+      ex('3', 'Flexão Archer', '3x8', 'Braço lateral', 75),
+      ex('4', 'Flexão Explosiva', '3x8', 'Subida explosiva', 75),
+      ex('5', 'Prancha Dinâmica', '3x30s', 'Alterne os apoios', 45),
+    ]
+  ),
+
+  createWorkout(
+    'IntB',
+    'Treino B',
+    'Costas & Bíceps',
+    '⚡',
+    'Intermediate',
+    35,
+    [
+      ex('1', 'Remada Australiana', '4x10', 'Peito na barra', 75),
+      ex('2', 'Flexão Invertida', '3x8', 'Controle total', 75),
+      ex('3', 'Isométrico Bíceps', '3x30s', 'Segure forte', 45),
+      ex('4', 'Superman Rotação', '3x12', 'Rotação controlada', 45),
+      ex('5', 'Prancha Ombro', '3x20', 'Evite balanço', 45),
+    ]
+  ),
+
+  createWorkout(
+    'IntC',
+    'Treino C',
+    'Pernas & Core',
+    '🦵',
+    'Intermediate',
+    35,
+    [
+      ex('1', 'Agachamento Búlgaro', '3x10 cada', 'Pé elevado', 90),
+      ex('2', 'Avanço com Salto', '3x8 cada', 'Troca no ar', 75),
+      ex('3', 'Agachamento Sumô', '3x15', 'Pés afastados', 60),
+      ex('4', 'Mountain Climber', '3x30s', 'Ritmo constante', 45),
+      ex('5', 'Prancha Dinâmica', '3x30s', 'Core firme', 45),
+    ]
+  ),
+
+  // ───────── ADVANCED ─────────
+  createWorkout(
+    'AdvA',
+    'Treino A',
+    'Peito & Tríceps',
+    '🚀',
+    'Advanced',
+    45,
+    [
+      ex('1', 'Flexão com Aplauso', '4x10', 'Explosão máxima', 90),
+      ex('2', 'Pseudo Planche', '4x8', 'Incline o corpo', 90),
+      ex('3', 'Dips Profundo', '4x12', 'Amplitude máxima', 90),
+      ex('4', 'Flexão Archer', '3x8', 'Braço lateral estendido', 90),
+      ex('5', 'Pike Push-up', '3x10', 'Simule press militar', 75),
+    ]
+  ),
+
+  createWorkout(
+    'AdvB',
+    'Treino B',
+    'Costas & Bíceps',
+    '🏆',
+    'Advanced',
+    45,
+    [
+      ex('1', 'Remada Elevada', '4x12', 'Pés elevados', 90),
+      ex('2', 'Chin-up Assistido', '3x8', 'Use elástico', 90),
+      ex('3', 'Remada Toalha', '3x10', 'Controle total', 75),
+      ex('4', 'Superman Isométrico', '3x30s', 'Segure no topo', 45),
+      ex('5', 'Prancha Avançada', '3x30s', 'Core rígido', 60),
+    ]
+  ),
+
+  createWorkout(
+    'AdvC',
+    'Treino C',
+    'Pernas & Core',
+    '🧠',
+    'Advanced',
+    45,
+    [
+      ex('1', 'Pistol Squat', '3x6 cada', 'Equilíbrio total', 90),
+      ex('2', 'Nordic Curl', '3x5', 'Desça lentamente', 90),
+      ex('3', 'Dragon Flag', '3x5', 'Corpo reto', 90),
+      ex('4', 'L-Sit', '3x15s', 'Pernas paralelas', 60),
+      ex('5', 'Prancha Elevação', '3x10', 'Braço e perna opostos', 60),
+    ]
+  ),
 ];
 
-export const WORKOUT_MAP = Object.fromEntries(WORKOUTS.map((w) => [w.key, w])) as Record<
-  string,
-  Workout
->;
+// ⚡ Busca rápida
+export const WORKOUT_MAP = Object.fromEntries(
+  WORKOUTS.map((workout) => [workout.key, workout])
+) as Record<string, Workout>;
 
+// 🔎 Filtrar por nível
 export function getWorkoutsByLevel(level: WorkoutLevel): Workout[] {
-  return WORKOUTS.filter((w) => w.level === level);
+  return WORKOUTS.filter((workout) => workout.level === level);
 }
 
-export function getNextWorkout(history: { workoutKey: string }[], level: WorkoutLevel): Workout {
-  const levelWorkouts = getWorkoutsByLevel(level);
-  if (history.length === 0) return levelWorkouts[0];
-  const lastKey = history[history.length - 1].workoutKey;
-  const lastIndex = levelWorkouts.findIndex((w) => w.key === lastKey);
-  return levelWorkouts[(lastIndex + 1) % levelWorkouts.length];
+// 🔁 Próximo treino automático
+export function getNextWorkout(
+  history: { workoutKey: string }[],
+  level: WorkoutLevel
+): Workout {
+  const workouts = getWorkoutsByLevel(level);
+
+  if (!history.length) {
+    return workouts[0];
+  }
+
+  const lastWorkoutKey = history.at(-1)?.workoutKey;
+
+  const currentIndex = workouts.findIndex(
+    (workout) => workout.key === lastWorkoutKey
+  );
+
+  return workouts[(currentIndex + 1) % workouts.length];
 }
+
