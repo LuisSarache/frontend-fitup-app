@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd FitUp-mobile && npm install && npx expo export --platform web",
+  "outputDirectory": "FitUp-mobile/dist",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

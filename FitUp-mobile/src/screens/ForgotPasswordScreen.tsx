@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, View, Text, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, View, Text, StyleSheet, TextInput } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Mail } from 'lucide-react-native';
 import { RootStackParamList } from '../navigation/types';
-import { authService } from '../services/auth';
-import { parseApiError } from '../utils/apiErrors';
 import { ErrorMessage } from '../components/ErrorMessage';
 import BackButton from '../components/BackButton';
-import { Button, TextField } from '../components/ui';
+import { Button } from '../components/ui';
 import { colors, font } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPassword'>;
@@ -26,71 +26,112 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
     }
     setLoading(true);
     setError(null);
-    try {
-      await authService.forgotPassword(email.trim());
-      setSent(true);
-    } catch (err) {
-      setError(parseApiError(err));
-    } finally {
+    // TODO: chamar API de recuperação de senha
+    setTimeout(() => {
       setLoading(false);
-    }
+      setSent(true);
+    }, 1500);
   };
 
   return (
-    <KeyboardAvoidingView
-      style={s.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={[s.content, { paddingTop: insets.top + 24 }]}
-        keyboardShouldPersistTaps="handled"
+    <LinearGradient colors={['#0A0A0A', '#111827', '#0A0A0A']} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <BackButton />
-
-        {sent ? (
-          <View style={s.center}>
-            <Text style={s.icon}>📧</Text>
-            <Text style={s.title}>E-mail enviado!</Text>
-            <Text style={s.sub}>
-              Verifique sua caixa de entrada em{'\n'}
-              <Text style={s.email}>{email}</Text>
-            </Text>
-            <Button title="Voltar ao login" onPress={() => navigation.navigate('Login')} />
+        <ScrollView
+          contentContainerStyle={[s.content, { paddingTop: insets.top + 24 }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={s.backWrapper}>
+            <BackButton />
           </View>
-        ) : (
-          <>
-            <Text style={s.title}>Recuperar senha</Text>
-            <Text style={s.sub}>
-              Digite seu e-mail e enviaremos um link para redefinir sua senha.
-            </Text>
 
-            <TextField
-              placeholder="seu@email.com"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-              autoFocus
-            />
+          {sent ? (
+            <View style={s.center}>
+              <View style={s.iconWrapper}>
+                <Text style={s.icon}>📧</Text>
+              </View>
+              <Text style={s.title}>E-mail enviado!</Text>
+              <Text style={s.sub}>
+                Verifique sua caixa de entrada em{'\n'}
+                <Text style={s.email}>{email}</Text>
+              </Text>
+              <Button title="Voltar ao login" onPress={() => navigation.navigate('Login')} />
+            </View>
+          ) : (
+            <>
+              <View style={s.header}>
+                <Text style={s.title}>Recuperar{'\n'}senha 🔐</Text>
+                <Text style={s.sub}>
+                  Digite seu e-mail e enviaremos um link para redefinir sua senha.
+                </Text>
+              </View>
 
-            {error && <ErrorMessage message={error} />}
+              <View style={s.card}>
+                <View style={s.labelRow}>
+                  <Mail size={18} color={colors.green} />
+                  <Text style={s.label}>E-mail</Text>
+                </View>
+                <TextInput
+                  style={s.input}
+                  placeholder="seu@email.com"
+                  placeholderTextColor={colors.muted}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                  autoFocus
+                />
+              </View>
 
-            <Button title="Enviar link" onPress={handleSend} loading={loading} />
-          </>
-        )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+              {error && <ErrorMessage message={error} />}
+
+              <Button title="Enviar link" onPress={handleSend} loading={loading} />
+            </>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg },
-  content: { flexGrow: 1, padding: 24 },
+  content: { flexGrow: 1, paddingHorizontal: 24, paddingBottom: 40 },
+  backWrapper: { marginBottom: 20 },
+  header: { marginBottom: 32 },
+  title: {
+    color: '#fff',
+    fontSize: 36,
+    fontWeight: '800',
+    lineHeight: 42,
+    marginBottom: 12,
+  },
+  sub: { color: '#9CA3AF', fontSize: 15, lineHeight: 24 },
+  card: {
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderRadius: 24,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 16,
+  },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
+  label: { color: colors.muted, fontSize: 14, fontWeight: '600' },
+  input: { color: colors.white, fontSize: 18, fontWeight: '700' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  icon: { fontSize: 64, marginBottom: 16 },
-  title: { fontSize: font.xl, fontWeight: '800', color: colors.white, marginBottom: 8 },
-  sub: { fontSize: font.md, color: colors.muted, marginBottom: 32, lineHeight: 24 },
+  iconWrapper: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: 'rgba(34,197,94,0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  icon: { fontSize: 48 },
   email: { color: colors.green, fontWeight: '700' },
 });
