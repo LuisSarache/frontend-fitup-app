@@ -58,7 +58,6 @@ export default function OnboardingScreen({
   const insets = useSafeAreaInsets();
 
   const [name, setName] = useState('');
-  const [email, setEmail] = useState(profile?.email ?? '');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
   const [dob, setDob] = useState('');
@@ -78,15 +77,13 @@ export default function OnboardingScreen({
       name,
       weight,
       height,
-      dob,
-      email
+      dob
     );
 
     setErrors(errs);
 
     setTouched({
       name: true,
-      email: true,
       weight: true,
       height: true,
       dob: true,
@@ -122,7 +119,7 @@ export default function OnboardingScreen({
 
     await setProfile({
       name: name.trim(),
-      email: email.trim(),
+      email: profile?.email ?? '',
       weightKg: parseFloat(weight.replace(',', '.')),
       heightCm: parseInt(height, 10),
       dateOfBirth: dobISO,
@@ -161,15 +158,6 @@ export default function OnboardingScreen({
       set: setName,
       placeholder: 'Como podemos te chamar?',
       icon: User,
-    },
-    {
-      key: 'email',
-      label: 'E-mail',
-      value: email,
-      set: setEmail,
-      placeholder: 'seu@email.com',
-      keyboard: 'email-address',
-      icon: Mail,
     },
     {
       key: 'dob',
@@ -272,8 +260,7 @@ export default function OnboardingScreen({
                         name,
                         weight,
                         height,
-                        dob,
-                        email
+                        dob
                       )
                     );
                   }}
