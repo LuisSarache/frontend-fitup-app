@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Play } from 'lucide-react-native';
 import { RootStackParamList } from '../navigation/types';
 import { getWorkoutsByLevel } from '../data/workouts';
-import { colors, font } from '../theme';
+import { colors } from '../theme';
 import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WorkoutSelection'>;
@@ -18,71 +20,121 @@ export default function WorkoutSelectionScreen({ navigation, route }: Props) {
     level === 'Beginner' ? 'Iniciante' : level === 'Intermediate' ? 'Intermediário' : 'Avançado';
 
   return (
-    <ScrollView
-      style={s.container}
-      contentContainerStyle={{ paddingBottom: 32 }}
-      showsVerticalScrollIndicator={false}
-    >
-      <View style={{ paddingTop: insets.top + 24 }}>
-        <BackButton />
-        <Text style={s.title}>Escolha seu{'\n'}treino de hoje 🏠</Text>
-        <Text style={s.sub}>Nível: {levelLabel}</Text>
+    <LinearGradient colors={['#0A0A0A', '#111827', '#0A0A0A']} style={s.container}>
+      <ScrollView
+        contentContainerStyle={{ paddingTop: insets.top + 20, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={s.backWrapper}>
+          <BackButton />
+        </View>
+
+        <View style={s.header}>
+          <Text style={s.badge}>{levelLabel.toUpperCase()}</Text>
+          <Text style={s.title}>Escolha seu{'\n'}treino de hoje 💪</Text>
+          <Text style={s.subtitle}>
+            {workouts.length} treinos disponíveis para o seu nível.
+          </Text>
+        </View>
 
         {workouts.map(({ key, label, focus, emoji, durationMinutes, exercises }) => (
           <TouchableOpacity
             key={key}
+            activeOpacity={0.88}
             style={s.card}
             onPress={() => navigation.navigate('Workout', { workoutKey: key })}
             accessibilityRole="button"
             accessibilityLabel={`${label}: ${focus}`}
           >
-            <Text style={s.emoji}>{emoji}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={s.cardTitle}>{label}</Text>
-              <Text style={s.cardDesc}>{focus}</Text>
-              <Text style={s.cardMeta}>
-                {exercises.length} exercícios · ~{durationMinutes}min
-              </Text>
-            </View>
-            <View style={s.startBadge}>
-              <Text style={s.startText}>Iniciar</Text>
-            </View>
+            <LinearGradient
+              colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']}
+              style={s.cardGradient}
+            >
+              <View style={s.emojiWrapper}>
+                <Text style={s.emoji}>{emoji}</Text>
+              </View>
+
+              <View style={{ flex: 1 }}>
+                <Text style={s.cardTitle}>{label}</Text>
+                <Text style={s.cardDesc}>{focus}</Text>
+                <Text style={s.cardMeta}>
+                  {exercises.length} exercícios · ~{durationMinutes}min
+                </Text>
+              </View>
+
+              <View style={s.playButton}>
+                <Play size={20} color="#fff" fill="#fff" />
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         ))}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.bg, paddingHorizontal: 24 },
-  title: {
-    fontSize: font.xl,
-    fontWeight: '800',
-    color: colors.white,
-    marginBottom: 8,
-    lineHeight: 34,
+  container: { flex: 1 },
+  backWrapper: { paddingHorizontal: 24, marginBottom: 20 },
+  header: { paddingHorizontal: 24, marginBottom: 34 },
+  badge: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(34,197,94,0.12)',
+    color: '#4ADE80',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 18,
   },
-  sub: { fontSize: font.sm, color: colors.green, marginBottom: 32, fontWeight: '600' },
+  title: {
+    color: '#fff',
+    fontSize: 36,
+    fontWeight: '800',
+    lineHeight: 42,
+    marginBottom: 12,
+  },
+  subtitle: { color: '#9CA3AF', fontSize: 15, lineHeight: 24 },
   card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 18,
+    marginHorizontal: 24,
+    borderRadius: 28,
+    overflow: 'hidden',
+    marginBottom: 18,
+    shadowColor: '#22C55E',
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  cardGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 14,
+    padding: 22,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
-  emoji: { fontSize: 28, marginRight: 14 },
-  cardTitle: { fontSize: font.lg, fontWeight: '700', color: colors.white },
-  cardDesc: { fontSize: font.sm, color: colors.muted, marginTop: 2 },
-  cardMeta: { fontSize: 11, color: colors.muted, marginTop: 4 },
-  startBadge: {
-    backgroundColor: colors.green,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  emojiWrapper: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginRight: 18,
   },
-  startText: { color: colors.white, fontWeight: '700', fontSize: font.sm },
+  emoji: { fontSize: 34 },
+  cardTitle: { color: '#fff', fontSize: 22, fontWeight: '800', marginBottom: 6 },
+  cardDesc: { color: '#9CA3AF', fontSize: 14, lineHeight: 22, marginBottom: 8 },
+  cardMeta: { color: '#6B7280', fontSize: 12, fontWeight: '600' },
+  playButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(34,197,94,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 14,
+  },
 });
