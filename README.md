@@ -297,7 +297,6 @@ Desenvolvido com 💚 por [Seu Nome](https://github.com/seu-usuario)
 
 ## 📚 Documentação adicional
 
-- [Guia do Backend](../BACKEND_GUIDE.md) — Especificação completa da API
 - [Expo Docs](https://docs.expo.dev/)
 - [React Navigation](https://reactnavigation.org/)
 - [React Native](https://reactnative.dev/)
