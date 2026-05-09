@@ -18,8 +18,6 @@ Treinos personalizados por nível (Iniciante, Intermediário, Avançado), sistem
 - ✅ **Perfil** — Edição de dados, cálculo de IMC, TMB e peso ideal
 - ✅ **Notificações** — Lembretes diários de treino
 - ✅ **Navegação por tabs** — Home, Progresso, Conquistas, Perfil
-- ✅ **Modo offline** — Funciona sem internet (mock local de autenticação)
-
 ---
 
 ## 🛠️ Stack
@@ -273,25 +271,10 @@ npm run android
 
 ---
 
-## 🤝 Contribuindo
-
-1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
----
 
 ## 👨‍💻 Autor
 
-Desenvolvido com 💚 por [Seu Nome](https://github.com/seu-usuario)
+Desenvolvido por Luis Otávio, Mateus Gabriel, Erick e Maria Gabriella
 
 ---
 
