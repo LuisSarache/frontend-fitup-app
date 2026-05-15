@@ -245,8 +245,6 @@ npm install
 npx expo start --clear
 ```
 
-### Erro de permissão de notificações
-As notificações só funcionam em dispositivos físicos. No emulador, o app continua funcionando normalmente sem notificações.
 
 ### Erro de build no Android
 ```bash
@@ -260,7 +258,6 @@ npm run android
 
 ## 📝 Roadmap
 
-- [ ] Integração com backend real
 - [ ] OAuth (Google, Facebook)
 - [ ] Vídeos dos exercícios
 - [ ] Modo escuro/claro

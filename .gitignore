@@ -1,0 +1,4 @@
+# Sensitive files
+login.json
+tmp_login.json
+*_login.json
