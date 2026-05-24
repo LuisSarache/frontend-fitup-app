@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import { AppProvider } from './src/context/AppContext';
+import { ToastProvider } from './src/context/ToastContext';
 import { RootStackParamList } from './src/navigation/types';
 import AppTabs from './src/navigation/AppTabs';
 import { setUnauthorizedHandler } from './src/services/api';
@@ -36,7 +37,8 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <NavigationContainer
+        <ToastProvider>
+          <NavigationContainer
           ref={navRef}
           onReady={() => {
             routeNameRef.current = navRef.current?.getCurrentRoute()?.name;
@@ -67,6 +69,7 @@ export default function App() {
             <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        </ToastProvider>
       </AppProvider>
     </SafeAreaProvider>
   );
