@@ -4,10 +4,7 @@ import { load, save, remove, KEYS } from '../storage/storage';
 import { UserProfile, WorkoutEntry, StreakData, Achievement, WorkoutLevel } from '../types';
 import { getDefaultStreak } from '../utils/streak';
 import { sendAchievementNotification } from '../services/notifications';
-import { Analytics } from '../services/analytics';
 import { authService } from '../services/auth';
-import { env } from '../config/env';
-import api from '../services/api';
 
 type AppState = {
   profile: UserProfile | null;
@@ -39,63 +36,32 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      load<UserProfile>(KEYS.profile),
-      load<string>(KEYS.token),
-      load<boolean>(KEYS.analyticsEnabled),
-    ]).then(async ([p, t, analyticsEnabled]) => {
-      Analytics.setCollectionEnabled(analyticsEnabled ?? true);
-      if (p) {
-        setProfileState(p);
-        Analytics.setUserLevel(p.level);
+    (async () => {
+      try {
+        const [p, t, s, h, a] = await Promise.all([
+          load<UserProfile>(KEYS.profile),
+          load<string>(KEYS.token),
+          load<StreakData>(KEYS.streak),
+          load<WorkoutEntry[]>(KEYS.history),
+          load<Achievement[]>('@fitup:achievements'),
+        ]);
+
+        if (p) setProfileState(p);
+        if (t) setTokenState(t);
+        if (s) setStreakState(s);
+        if (h) setHistoryState(h);
+        if (a) setAchievementsState(a);
+      } catch (error) {
+        console.error('[AppContext] Error:', error);
+      } finally {
+        setIsLoading(false);
       }
-      if (t) {
-        setTokenState(t);
-        if (!env.useMock) {
-          try {
-            const [profileRes, streakRes, historyRes, achievementsRes] = await Promise.all([
-              api.get<UserProfile>('/profile').catch(() => null),
-              api.get<StreakData>('/streak').catch(() => null),
-              api.get<WorkoutEntry[]>('/workouts/history').catch(() => null),
-              api.get<Achievement[]>('/achievements').catch(() => null),
-            ]);
-            if (profileRes?.data) {
-              setProfileState(profileRes.data);
-              Analytics.setUserLevel(profileRes.data.level);
-              await save(KEYS.profile, profileRes.data);
-            }
-            if (streakRes?.data) setStreakState(streakRes.data);
-            if (historyRes?.data) setHistoryState(historyRes.data);
-            if (achievementsRes?.data) setAchievementsState(achievementsRes.data);
-          } catch {
-            // usa dados locais em caso de falha de rede
-          }
-        } else {
-          const [s, h, a] = await Promise.all([
-            load<StreakData>(KEYS.streak),
-            load<WorkoutEntry[]>(KEYS.history),
-            load<Achievement[]>('@fitup:achievements'),
-          ]);
-          if (s) setStreakState(s);
-          if (h) setHistoryState(h);
-          if (a) setAchievementsState(a);
-        }
-      }
-      setIsLoading(false);
-    });
+    })();
   }, []);
 
   const setProfile = useCallback(async (p: UserProfile) => {
     setProfileState(p);
-    Analytics.setUserLevel(p.level);
     await save(KEYS.profile, p);
-    if (!env.useMock) {
-      try {
-        await api.put('/profile', { name: p.name, weightKg: p.weightKg, heightCm: p.heightCm, level: p.level });
-      } catch {
-        // salvo localmente mesmo se a API falhar
-      }
-    }
   }, []);
 
   const setToken = useCallback(async (t: string | null) => {
@@ -109,16 +75,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       if (!profile) return;
       const updated = { ...profile, level: l };
       setProfileState(updated);
-      Analytics.setUserLevel(l);
       await save(KEYS.profile, updated);
       await save(KEYS.level, l);
-      if (!env.useMock) {
-        try {
-          await api.put('/profile', { level: l });
-        } catch {
-          // salvo localmente mesmo se a API falhar
-        }
-      }
     },
     [profile],
   );
@@ -132,59 +90,33 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ) => {
       const completedAt = new Date().toISOString();
 
-      if (!env.useMock) {
-        const { data: entry } = await api.post<WorkoutEntry>('/workouts/history', {
-          workoutKey,
-          workoutLabel,
-          completedAt,
-          durationSeconds,
-          exercisesTotal,
-        });
-        setHistoryState((prev) => [...prev, entry]);
+      // Sempre usa modo mock/local
+      const { updateStreak } = await import('../utils/streak');
+      const { generateId } = await import('../utils/history');
+      const entry: WorkoutEntry = {
+        id: generateId(),
+        workoutKey,
+        workoutLabel,
+        completedAt,
+        durationSeconds,
+        exercisesTotal,
+      };
+      const newHistory = [...history, entry];
+      setHistoryState(newHistory);
+      await save(KEYS.history, newHistory);
 
-        const [streakRes, achievementsRes] = await Promise.all([
-          api.get<StreakData>('/streak').catch(() => null),
-          api.get<Achievement[]>('/achievements').catch(() => null),
-        ]);
-        if (streakRes?.data) setStreakState(streakRes.data);
-        if (achievementsRes?.data) {
-          const prev = achievements;
-          const newOnes = achievementsRes.data.filter(
-            (a) => !prev.find((p) => p.id === a.id),
-          );
-          setAchievementsState(achievementsRes.data);
-          for (const a of newOnes) {
-            await sendAchievementNotification(a.label, a.emoji);
-          }
-        }
-      } else {
-        const { updateStreak } = await import('../utils/streak');
-        const { generateId } = await import('../utils/history');
-        const entry: WorkoutEntry = {
-          id: generateId(),
-          workoutKey,
-          workoutLabel,
-          completedAt,
-          durationSeconds,
-          exercisesTotal,
-        };
-        const newHistory = [...history, entry];
-        setHistoryState(newHistory);
-        await save(KEYS.history, newHistory);
+      const { streak: newStreak, newAchievement } = updateStreak(streak);
+      setStreakState(newStreak);
+      await save(KEYS.streak, newStreak);
 
-        const { streak: newStreak, newAchievement } = updateStreak(streak);
-        setStreakState(newStreak);
-        await save(KEYS.streak, newStreak);
-
-        if (newAchievement) {
-          const newAchievements = [
-            ...achievements,
-            { ...newAchievement, unlockedAt: new Date().toISOString() },
-          ];
-          setAchievementsState(newAchievements);
-          await save('@fitup:achievements', newAchievements);
-          await sendAchievementNotification(newAchievement.label, newAchievement.emoji);
-        }
+      if (newAchievement) {
+        const newAchievements = [
+          ...achievements,
+          { ...newAchievement, unlockedAt: new Date().toISOString() },
+        ];
+        setAchievementsState(newAchievements);
+        await save('@fitup:achievements', newAchievements);
+        await sendAchievementNotification(newAchievement.label, newAchievement.emoji);
       }
     },
     [history, streak, achievements],
@@ -194,7 +126,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     await authService.logout();
     setProfileState(null);
     setTokenState(null);
-    Analytics.reset();
   }, []);
 
   return (

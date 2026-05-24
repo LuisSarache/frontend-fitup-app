@@ -46,13 +46,17 @@ module.exports = ({ config: expoConfig }) => {
         },
       },
     ],
-    ...(hasAndroidFirebaseConfig || hasIosFirebaseConfig ? ['@react-native-firebase/app'] : []),
   ];
 
   return {
     ...baseConfig,
     scheme: 'fitup',
     plugins,
+    extra: {
+      ...baseConfig.extra,
+      EXPO_PUBLIC_USE_MOCK: process.env.EXPO_PUBLIC_USE_MOCK || 'true',
+      EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL || 'https://backend-fitup.onrender.com',
+    },
     ios: {
       ...baseConfig.ios,
       ...(iosBundleIdentifier ? { bundleIdentifier: iosBundleIdentifier } : {}),

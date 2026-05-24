@@ -9,7 +9,6 @@ import { ToastProvider } from './src/context/ToastContext';
 import { RootStackParamList } from './src/navigation/types';
 import AppTabs from './src/navigation/AppTabs';
 import { setUnauthorizedHandler } from './src/services/api';
-import { Analytics } from './src/services/analytics';
 
 import SplashScreen from './src/screens/SplashScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -26,7 +25,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
   const navRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
-  const routeNameRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
@@ -38,24 +36,7 @@ export default function App() {
     <SafeAreaProvider>
       <AppProvider>
         <ToastProvider>
-          <NavigationContainer
-            ref={navRef}
-            onReady={() => {
-              routeNameRef.current = navRef.current?.getCurrentRoute()?.name;
-              if (routeNameRef.current) {
-                Analytics.screenViewed(routeNameRef.current);
-              }
-            }}
-            onStateChange={() => {
-              const previousRouteName = routeNameRef.current;
-              const currentRouteName = navRef.current?.getCurrentRoute()?.name;
-
-              if (currentRouteName && previousRouteName !== currentRouteName) {
-                routeNameRef.current = currentRouteName;
-                Analytics.screenViewed(currentRouteName);
-              }
-            }}
-          >
+          <NavigationContainer ref={navRef}>
             <StatusBar style="light" />
             <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
               <Stack.Screen name="Splash" component={SplashScreen} />

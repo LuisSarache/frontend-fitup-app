@@ -20,23 +20,10 @@ declare const require: (moduleName: string) => AnalyticsPackage;
 let analyticsModule: FirebaseAnalyticsModule | null | undefined;
 
 export function getFirebaseAnalytics(): FirebaseAnalyticsModule | null {
-  if (Platform.OS === 'web') return null;
-  if (analyticsModule !== undefined) return analyticsModule;
-
-  try {
-    // Lazy require keeps Expo Go/web from crashing before a native Firebase build exists.
-    analyticsModule = require('@react-native-firebase/analytics').default();
-    if (__DEV__) console.log('[Firebase] Analytics initialized successfully');
-  } catch (error) {
-    analyticsModule = null;
-    if (__DEV__) {
-      console.warn('[Firebase] Analytics unavailable - app will work without it');
-    }
-  }
-
-  return analyticsModule;
+  // Desabilitado temporariamente para evitar crashes
+  return null;
 }
 
 export function hasFirebaseAnalytics(): boolean {
-  return getFirebaseAnalytics() !== null;
+  return false;
 }

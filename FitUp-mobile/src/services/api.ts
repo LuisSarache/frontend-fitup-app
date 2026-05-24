@@ -4,8 +4,14 @@ import { withRetry } from '../utils/apiErrors';
 import { handleNetworkError } from '../utils/networkError';
 import { getApiBaseUrl } from '../config/env';
 
+const baseURL = getApiBaseUrl();
+
+if (__DEV__) {
+  console.log('[API] Initializing with baseURL:', baseURL);
+}
+
 const api = axios.create({
-  baseURL: getApiBaseUrl(),
+  baseURL,
   timeout: 10000,
 });
 
