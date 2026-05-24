@@ -5,6 +5,8 @@ import { UserProfile, WorkoutEntry, StreakData, Achievement, WorkoutLevel } from
 import { getDefaultStreak } from '../utils/streak';
 import { sendAchievementNotification } from '../services/notifications';
 import { authService } from '../services/auth';
+import { env } from '../config/env';
+import api from '../services/api';
 
 type AppState = {
   profile: UserProfile | null;
@@ -47,7 +49,30 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ]);
 
         if (p) setProfileState(p);
-        if (t) setTokenState(t);
+        if (t) {
+          setTokenState(t);
+          
+          // Se não estiver em modo mock, busca dados do backend
+          if (!env.useMock) {
+            try {
+              const [profileRes, streakRes, historyRes, achievementsRes] = await Promise.all([
+                api.get<UserProfile>('/profile').catch(() => null),
+                api.get<StreakData>('/streak').catch(() => null),
+                api.get<WorkoutEntry[]>('/workouts/history').catch(() => null),
+                api.get<Achievement[]>('/achievements').catch(() => null),
+              ]);
+              if (profileRes?.data) {
+                setProfileState(profileRes.data);
+                await save(KEYS.profile, profileRes.data);
+              }
+              if (streakRes?.data) setStreakState(streakRes.data);
+              if (historyRes?.data) setHistoryState(historyRes.data);
+              if (achievementsRes?.data) setAchievementsState(achievementsRes.data);
+            } catch (error) {
+              console.warn('[AppContext] Failed to load from API, using local data');
+            }
+          }
+        }
         if (s) setStreakState(s);
         if (h) setHistoryState(h);
         if (a) setAchievementsState(a);
