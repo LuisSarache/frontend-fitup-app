@@ -19,9 +19,10 @@
       "bundleIdentifier": "com.fitup.app"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0A0F1E"
+    "googleServicesFile": "./google-services.json",
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
+      "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
       "navigationBar": {

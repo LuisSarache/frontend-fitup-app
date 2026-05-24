@@ -9,19 +9,16 @@
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "googleServicesFile": "./google-services.json"
+      }
     },
     "preview": {
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "googleServicesFile": "./google-services.json"
+      }
     },
     "production": {
-      "autoIncrement": true,
-      "googleServicesFile": "./google-services.json"
+      "autoIncrement": true
     }
   },
   "submit": {
