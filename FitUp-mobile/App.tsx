@@ -3,6 +3,8 @@ import { NavigationContainer, NavigationContainerRef } from '@react-navigation/n
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
+import { Platform } from 'react-native';
 
 import { AppProvider } from './src/context/AppContext';
 import { RootStackParamList } from './src/navigation/types';
@@ -26,6 +28,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export default function App() {
   const navRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
   const routeNameRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setVisibilityAsync('hidden');
+      NavigationBar.setBehaviorAsync('overlay-swipe');
+      NavigationBar.setBackgroundColorAsync('#0A0F1E');
+    }
+  }, []);
 
   useEffect(() => {
     setUnauthorizedHandler(() => {

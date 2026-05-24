@@ -23,7 +23,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0F1E"
       },
-      "package": "com.fitup.app"
+      "package": "com.fitup.app",
+      "navigationBar": {
+        "visible": "immersive",
+        "backgroundColor": "#0A0F1E"
+      },
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "favicon": "./assets/favicon.png",
