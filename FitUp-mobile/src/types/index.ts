@@ -8,6 +8,7 @@ export type UserProfile = {
   dateOfBirth: string;
   sex: 'male' | 'female';
   level: WorkoutLevel;
+  avatar?: string;
 };
 
 export type WorkoutEntry = {

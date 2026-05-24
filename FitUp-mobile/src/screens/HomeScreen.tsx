@@ -152,7 +152,7 @@ export default function HomeScreen({
             }
           >
             <Text style={s.avatarText}>
-              👤
+              {profile?.avatar ?? '👤'}
             </Text>
           </TouchableOpacity>
         </View>

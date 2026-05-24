@@ -43,7 +43,7 @@ export default function ProfileScreen({ navigation }: Props) {
   const [name, setName] = useState(profile?.name ?? '');
   const [weight, setWeight] = useState(String(profile?.weightKg ?? ''));
   const [height, setHeight] = useState(String(profile?.heightCm ?? ''));
-  const [selectedEmoji, setSelectedEmoji] = useState('👤');
+  const [selectedEmoji, setSelectedEmoji] = useState(profile?.avatar ?? '👤');
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifHour, setNotifHour] = useState(18);
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
@@ -75,7 +75,7 @@ export default function ProfileScreen({ navigation }: Props) {
       Alert.alert('Dados inválidos', 'Verifique os campos antes de salvar.');
       return;
     }
-    await setProfile({ ...profile, name: name.trim(), weightKg: w, heightCm: h });
+    await setProfile({ ...profile, name: name.trim(), weightKg: w, heightCm: h, avatar: selectedEmoji });
     setEditing(false);
   };
 
