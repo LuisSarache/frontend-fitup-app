@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { Platform } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -43,7 +42,9 @@ export default function App() {
             ref={navRef}
             onReady={() => {
               routeNameRef.current = navRef.current?.getCurrentRoute()?.name;
-              if (routeNameRef.current) Analytics.screenViewed(routeNameRef.current);
+              if (routeNameRef.current) {
+                Analytics.screenViewed(routeNameRef.current);
+              }
             }}
             onStateChange={() => {
               const previousRouteName = routeNameRef.current;
