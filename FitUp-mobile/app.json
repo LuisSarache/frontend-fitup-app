@@ -25,10 +25,6 @@
       "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
-      "navigationBar": {
-        "visible": "immersive",
-        "backgroundColor": "#0A0F1E"
-      },
       "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
