@@ -9,6 +9,7 @@ import { save, load, remove, KEYS } from '../storage/storage';
 import { Analytics } from '../services/analytics';
 import { RestTimerModal } from './RestTimerModal';
 import { useRestTimer } from '../hooks/useRestTimer';
+import ExerciseCard from './ExerciseCard';
 import { colors, font } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Workout'>;
@@ -156,27 +157,17 @@ export default function WorkoutScreen({ navigation, route }: Props) {
       </View>
 
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        {workout.exercises.map(({ id, name, sets, tip, restSeconds }) => {
-          const done = !!checked[id];
+        {workout.exercises.map((exercise, idx) => {
+          const done = !!checked[exercise.id];
           return (
-            <TouchableOpacity
-              key={id}
-              style={[s.card, done && s.cardDone]}
-              onPress={() => toggle(id, name, restSeconds)}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: done }}
-              accessibilityLabel={`${name}, ${sets}`}
-            >
-              <View style={[s.checkbox, done && s.checkboxDone]}>
-                {done && <Text style={s.checkmark}>✓</Text>}
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={[s.exName, done && s.textDone]}>{name}</Text>
-                <Text style={s.sets}>{sets}</Text>
-                <Text style={s.tip}>💡 {tip}</Text>
-              </View>
-              <Text style={s.rest}>⏱ {restSeconds}s</Text>
-            </TouchableOpacity>
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              index={idx}
+              total={total}
+              isActive={done}
+              onPress={() => toggle(exercise.id, exercise.name, exercise.restSeconds)}
+            />
           );
         })}
         <View style={{ height: 100 }} />

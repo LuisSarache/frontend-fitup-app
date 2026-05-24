@@ -7,6 +7,9 @@ export type Exercise = {
   sets: string;
   tip: string;
   restSeconds: number;
+  instructions?: string[];
+  targetMuscles?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
 };
 
 export type Workout = {
@@ -33,13 +36,19 @@ const ex = (
   name: string,
   sets: string,
   tip: string,
-  restSeconds: number
+  restSeconds: number,
+  instructions?: string[],
+  targetMuscles?: string[],
+  difficulty?: 'easy' | 'medium' | 'hard'
 ): Exercise => ({
   id,
   name,
   sets,
   tip,
   restSeconds,
+  instructions,
+  targetMuscles,
+  difficulty,
 });
 
 // 🛠 Helper treino
@@ -72,11 +81,86 @@ export const WORKOUTS: Workout[] = [
     'Beginner',
     25,
     [
-      ex('1', 'Flexão de Braço', '3x10', 'Core contraído', 60),
-      ex('2', 'Tríceps no Banco', '3x12', 'Controle na descida', 60),
-      ex('3', 'Flexão Diamante', '3x8', 'Mãos próximas', 60),
-      ex('4', 'Flexão Inclinada', '3x10', 'Superfície elevada', 60),
-      ex('5', 'Mergulho entre Cadeiras', '3x10', 'Cotovelos para trás', 60),
+      ex(
+        '1',
+        'Flexão de Braço',
+        '3x10',
+        'Core contraído',
+        60,
+        [
+          'Posicione as mãos na largura dos ombros',
+          'Mantenha o corpo reto da cabeça aos pés',
+          'Desça até o peito quase tocar o chão',
+          'Empurre com força para subir',
+          'Expire ao subir, inspire ao descer',
+        ],
+        ['Peitoral', 'Tríceps', 'Ombros'],
+        'medium'
+      ),
+      ex(
+        '2',
+        'Tríceps no Banco',
+        '3x12',
+        'Controle na descida',
+        60,
+        [
+          'Sente na borda de uma cadeira ou banco',
+          'Apoie as mãos na borda ao lado do quadril',
+          'Deslize o quadril para frente, fora do banco',
+          'Dobre os cotovelos para descer o corpo',
+          'Empurre para cima até estender os braços',
+        ],
+        ['Tríceps', 'Ombros'],
+        'easy'
+      ),
+      ex(
+        '3',
+        'Flexão Diamante',
+        '3x8',
+        'Mãos próximas',
+        60,
+        [
+          'Posicione as mãos próximas formando um diamante',
+          'Polegares e indicadores se tocando',
+          'Mantenha os cotovelos próximos ao corpo',
+          'Desça controladamente',
+          'Foco total no tríceps',
+        ],
+        ['Tríceps', 'Peitoral'],
+        'hard'
+      ),
+      ex(
+        '4',
+        'Flexão Inclinada',
+        '3x10',
+        'Superfície elevada',
+        60,
+        [
+          'Apoie as mãos em uma superfície elevada (mesa, sofá)',
+          'Corpo inclinado, pés no chão',
+          'Desça o peito em direção à superfície',
+          'Empurre para voltar à posição inicial',
+          'Ótimo para iniciantes',
+        ],
+        ['Peitoral', 'Tríceps'],
+        'easy'
+      ),
+      ex(
+        '5',
+        'Mergulho entre Cadeiras',
+        '3x10',
+        'Cotovelos para trás',
+        60,
+        [
+          'Posicione duas cadeiras paralelas',
+          'Apoie uma mão em cada cadeira',
+          'Pés no chão ou elevados',
+          'Desça dobrando os cotovelos',
+          'Empurre para subir',
+        ],
+        ['Tríceps', 'Peitoral', 'Ombros'],
+        'medium'
+      ),
     ]
   ),
 
