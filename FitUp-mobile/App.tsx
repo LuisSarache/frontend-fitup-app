@@ -3,6 +3,8 @@ import { NavigationContainer, NavigationContainerRef } from '@react-navigation/n
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
+import { Platform } from 'react-native';
 
 import { AppProvider } from './src/context/AppContext';
 import { ToastProvider } from './src/context/ToastContext';
@@ -30,6 +32,12 @@ export default function App() {
     setUnauthorizedHandler(() => {
       navRef.current?.reset({ index: 0, routes: [{ name: 'Login' }] });
     });
+
+    // Configurar navigation bar no Android
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync('#0A0F1E');
+      NavigationBar.setButtonStyleAsync('light');
+    }
   }, []);
 
   return (

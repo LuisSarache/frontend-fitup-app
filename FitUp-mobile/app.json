@@ -25,7 +25,10 @@
       "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "resize",
+      "navigationBar": {
+        "backgroundColor": "#0A0F1E"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png",
