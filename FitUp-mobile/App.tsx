@@ -3,11 +3,8 @@ import { NavigationContainer, NavigationContainerRef } from '@react-navigation/n
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import * as NavigationBar from 'expo-navigation-bar';
-import { Platform } from 'react-native';
 
 import { AppProvider } from './src/context/AppContext';
-import { ToastProvider } from './src/context/ToastContext';
 import { RootStackParamList } from './src/navigation/types';
 import AppTabs from './src/navigation/AppTabs';
 import { setUnauthorizedHandler } from './src/services/api';
@@ -31,14 +28,6 @@ export default function App() {
   const routeNameRef = useRef<string | undefined>(undefined);
 
   useEffect(() => {
-    if (Platform.OS === 'android') {
-      NavigationBar.setVisibilityAsync('hidden');
-      NavigationBar.setBehaviorAsync('overlay-swipe');
-      NavigationBar.setBackgroundColorAsync('#0A0F1E');
-    }
-  }, []);
-
-  useEffect(() => {
     setUnauthorizedHandler(() => {
       navRef.current?.reset({ index: 0, routes: [{ name: 'Login' }] });
     });
@@ -47,7 +36,6 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <ToastProvider>
         <NavigationContainer
           ref={navRef}
           onReady={() => {
@@ -79,7 +67,6 @@ export default function App() {
             <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
           </Stack.Navigator>
         </NavigationContainer>
-        </ToastProvider>
       </AppProvider>
     </SafeAreaProvider>
   );

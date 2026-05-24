@@ -38,11 +38,6 @@ export default function SplashScreen({ navigation }: Props) {
           </Text>
         </View>
         <Text style={s.tagline}>Train. Evolve. Repeat.</Text>
-        <View style={s.loadingContainer}>
-          <View style={s.loadingDot} />
-          <View style={[s.loadingDot, { animationDelay: '0.2s' }]} />
-          <View style={[s.loadingDot, { animationDelay: '0.4s' }]} />
-        </View>
       </Animated.View>
     </View>
   );

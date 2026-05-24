@@ -1,12 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Share } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
-import { useToast } from '../context/ToastContext';
 import { formatDuration } from '../utils/history';
 import { colors, font } from '../theme';
 
@@ -15,7 +13,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Completion'>;
 export default function CompletionScreen({ navigation, route }: Props) {
   const { workoutKey, workoutLabel, durationSeconds, exercisesTotal } = route.params;
   const { addWorkoutEntry, streak, profile } = useApp();
-  const toast = useToast();
   const insets = useSafeAreaInsets();
   const savedRef = useRef(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -28,7 +25,6 @@ export default function CompletionScreen({ navigation, route }: Props) {
     savedRef.current = true;
     addWorkoutEntry(workoutKey, workoutLabel, durationSeconds, exercisesTotal);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    toast.success('🏆 Treino completado com sucesso!');
     
     Animated.parallel([
       Animated.spring(scaleAnim, {
@@ -43,26 +39,21 @@ export default function CompletionScreen({ navigation, route }: Props) {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [addWorkoutEntry, durationSeconds, exercisesTotal, workoutKey, workoutLabel, scaleAnim, fadeAnim]);
 
   const handleShare = async () => {
     try {
       await Share.share({
         message: `🏆 Acabei de completar o ${workoutLabel}!\n⏱️ ${formatDuration(durationSeconds)}\n💪 ${exercisesTotal} exercícios\n🔥 Streak: ${streak.current} dias\n\nTreine comigo no FitUp!`,
       });
-      toast.success('Compartilhado com sucesso!');
-    } catch {
-      toast.error('Não foi possível compartilhar');
-    }
+    } catch {}
   };
 
   return (
-    <LinearGradient colors={['#0A0A0A', '#111827', '#0A0A0A']} style={{ flex: 1 }}>
-      <Animated.View style={[s.container, { paddingBottom: insets.bottom + 24, opacity: fadeAnim }]}>
+    <View style={[s.container, { paddingBottom: insets.bottom + 24, backgroundColor: colors.bg }]}>
+      <Animated.View style={{ opacity: fadeAnim, alignItems: 'center' }}>
         <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <View style={s.trophyWrapper}>
-            <Text style={s.trophy}>🏆</Text>
-          </View>
+          <Text style={s.trophy}>🏆</Text>
         </Animated.View>
         
         <Text style={s.title}>Parabéns!</Text>
@@ -70,55 +61,52 @@ export default function CompletionScreen({ navigation, route }: Props) {
 
         <View style={s.statsRow}>
           {[
-            { label: 'Duração', value: formatDuration(durationSeconds), icon: '⏱️' },
-            { label: 'Streak', value: String(streak.current), icon: '🔥' },
-            { label: 'Exercícios', value: String(exercisesTotal), icon: '💪' },
-            { label: 'Calorias', value: `~${estimatedCalories}`, icon: '⚡' },
-          ].map(({ label, value, icon }) => (
+            { label: 'Duração', value: formatDuration(durationSeconds) },
+            { label: 'Streak', value: `🔥 ${streak.current}` },
+            { label: 'Exercícios', value: String(exercisesTotal) },
+            { label: 'Calorias', value: `~${estimatedCalories}` },
+          ].map(({ label, value }) => (
             <View key={label} style={s.statCard}>
-              <Text style={s.statIcon}>{icon}</Text>
               <Text style={s.statValue}>{value}</Text>
               <Text style={s.statLabel}>{label}</Text>
             </View>
           ))}
         </View>
 
-        <View style={s.motivationalCard}>
-          <Text style={s.motivational}>
-            "Cada treino é um passo a mais na sua jornada. Continue assim! 💪"
-          </Text>
-        </View>
+        <Text style={s.motivational}>
+          Cada treino é um passo a mais na sua jornada. Continue assim! 💪
+        </Text>
 
         <TouchableOpacity
-          style={s.btnWrapper}
-          activeOpacity={0.9}
+          style={s.btn}
+          activeOpacity={0.7}
           onPress={() =>
             navigation.reset({ index: 0, routes: [{ name: 'MainTabs', params: { screen: 'Home' } }] })
           }
+          accessibilityRole="button"
         >
-          <LinearGradient colors={['#22C55E', '#16A34A']} style={s.btn}>
-            <Text style={s.btnText}>Finalizar</Text>
-          </LinearGradient>
+          <Text style={s.btnText}>Finalizar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={s.btnSecondary} activeOpacity={0.8} onPress={handleShare}>
+        <TouchableOpacity style={s.btnSecondary} activeOpacity={0.7} onPress={handleShare} accessibilityRole="button">
           <Text style={s.btnSecondaryText}>📤 Compartilhar conquista</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={s.btnSecondary}
-          activeOpacity={0.8}
+          activeOpacity={0.7}
           onPress={() =>
             navigation.reset({
               index: 0,
               routes: [{ name: 'MainTabs', params: { screen: 'Progress' } }],
             })
           }
+          accessibilityRole="button"
         >
           <Text style={s.btnSecondaryText}>Ver progresso →</Text>
         </TouchableOpacity>
       </Animated.View>
-    </LinearGradient>
+    </View>
   );
 }
 
@@ -129,77 +117,38 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
   },
-  trophyWrapper: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(34,197,94,0.12)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  trophy: { fontSize: 64 },
+  trophy: { fontSize: 80, marginBottom: 16 },
   title: { fontSize: font.xxl, fontWeight: '900', color: colors.white, marginBottom: 8 },
   sub: { fontSize: font.md, color: colors.muted, textAlign: 'center', marginBottom: 32 },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 32,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
+  statsRow: { flexDirection: 'row', gap: 10, marginBottom: 32, flexWrap: 'wrap', justifyContent: 'center' },
   statCard: {
     minWidth: '45%',
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 20,
-    padding: 18,
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    padding: 14,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(34,197,94,0.3)',
+    borderColor: colors.border,
   },
-  statIcon: { fontSize: 28, marginBottom: 8 },
-  statValue: { fontSize: 24, fontWeight: '800', color: colors.green, marginBottom: 4 },
-  statLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
-  motivationalCard: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 32,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
-  },
+  statValue: { fontSize: font.sm, fontWeight: '700', color: colors.green },
+  statLabel: { fontSize: 11, color: colors.muted, marginTop: 4 },
   motivational: {
     fontSize: font.sm,
     color: colors.muted,
     textAlign: 'center',
     fontStyle: 'italic',
+    marginBottom: 40,
     lineHeight: 22,
   },
-  btnWrapper: {
-    width: '100%',
-    borderRadius: 24,
-    overflow: 'hidden',
-    marginBottom: 12,
-    shadowColor: '#22C55E',
-    shadowOpacity: 0.35,
-    shadowRadius: 18,
-    elevation: 10,
-  },
   btn: {
-    height: 62,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btnText: { color: colors.white, fontWeight: '800', fontSize: font.lg },
-  btnSecondary: {
+    backgroundColor: colors.green,
+    borderRadius: 14,
+    padding: 16,
     width: '100%',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderRadius: 20,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 12,
   },
-  btnSecondaryText: { color: colors.green, fontWeight: '700', fontSize: font.md },
+  btnText: { color: colors.white, fontWeight: '700', fontSize: font.lg },
+  btnSecondary: { width: '100%', alignItems: 'center', padding: 12 },
+  btnSecondaryText: { color: colors.green, fontWeight: '600', fontSize: font.md },
 });
