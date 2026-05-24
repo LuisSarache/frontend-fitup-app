@@ -164,61 +164,46 @@ export default function SignUpScreen({
 
           {/* Email */}
           <View style={s.card}>
-            <View style={s.labelRow}>
-              <Mail
-                size={18}
-                color={colors.green}
-              />
-
-              <Text style={s.label}>
-                E-mail
-              </Text>
+            <View style={s.inputWrapper}>
+              <Mail size={20} color={colors.green} style={s.icon} />
+              <View style={s.inputContent}>
+                <Text style={s.label}>E-mail</Text>
+                <TextInput
+                  style={s.input}
+                  placeholder="seu@email.com"
+                  placeholderTextColor={colors.muted}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  textContentType="emailAddress"
+                />
+              </View>
             </View>
-
-            <TextInput
-              style={s.input}
-              placeholder="seu@email.com"
-              placeholderTextColor={
-                colors.muted
-              }
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-              textContentType="emailAddress"
-            />
           </View>
 
           {/* Password */}
           <View style={s.card}>
-            <View style={s.labelRow}>
-              <Lock
-                size={18}
-                color={colors.green}
-              />
-
-              <Text style={s.label}>
-                Senha
-              </Text>
+            <View style={s.inputWrapper}>
+              <Lock size={20} color={colors.green} style={s.icon} />
+              <View style={s.inputContent}>
+                <Text style={s.label}>Senha</Text>
+                <TextInput
+                  style={s.input}
+                  placeholder="Mínimo 6 caracteres"
+                  placeholderTextColor={colors.muted}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoComplete="new-password"
+                  textContentType="newPassword"
+                />
+                <Text style={s.passwordHint}>
+                  Use uma senha segura 🔒
+                </Text>
+              </View>
             </View>
-
-            <TextInput
-              style={s.input}
-              placeholder="Mínimo 6 caracteres"
-              placeholderTextColor={
-                colors.muted
-              }
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="new-password"
-              textContentType="newPassword"
-            />
-
-            <Text style={s.passwordHint}>
-              Use uma senha segura 🔒
-            </Text>
           </View>
 
           {/* Error */}
@@ -351,46 +336,46 @@ const s = StyleSheet.create({
   },
 
   card: {
-    backgroundColor:
-      'rgba(255,255,255,0.04)',
-
+    backgroundColor: 'rgba(255,255,255,0.04)',
     borderRadius: 24,
-
     padding: 18,
-
     marginBottom: 16,
-
     borderWidth: 1,
-
-    borderColor:
-      'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(255,255,255,0.06)',
   },
 
-  labelRow: {
+  inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
 
-    gap: 8,
+  icon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
 
-    marginBottom: 12,
+  inputContent: {
+    flex: 1,
   },
 
   label: {
     color: colors.muted,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
+    marginBottom: 4,
   },
 
   input: {
     color: colors.white,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 0,
   },
 
   passwordHint: {
-    marginTop: 12,
+    marginTop: 8,
     color: colors.green,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '600',
   },
 

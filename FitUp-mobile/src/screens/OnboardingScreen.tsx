@@ -230,46 +230,26 @@ export default function OnboardingScreen({
               icon: Icon,
             }) => (
               <View key={key} style={s.card}>
-                <View style={s.labelRow}>
-                  <Icon
-                    size={18}
-                    color={colors.green}
-                  />
-
-                  <Text style={s.label}>
-                    {label}
-                  </Text>
+                <View style={s.inputWrapper}>
+                  <Icon size={20} color={colors.green} style={s.icon} />
+                  <View style={s.inputContent}>
+                    <Text style={s.label}>{label}</Text>
+                    <TextInput
+                      style={s.input}
+                      placeholder={placeholder}
+                      placeholderTextColor={colors.muted}
+                      value={value}
+                      onChangeText={set}
+                      keyboardType={keyboard ?? 'default'}
+                      onBlur={() => {
+                        touch(key);
+                        setErrors(validateAll(name, weight, height, dob));
+                      }}
+                    />
+                  </View>
                 </View>
-
-                <TextInput
-                  style={s.input}
-                  placeholder={placeholder}
-                  placeholderTextColor={
-                    colors.muted
-                  }
-                  value={value}
-                  onChangeText={set}
-                  keyboardType={
-                    keyboard ?? 'default'
-                  }
-                  onBlur={() => {
-                    touch(key);
-
-                    setErrors(
-                      validateAll(
-                        name,
-                        weight,
-                        height,
-                        dob
-                      )
-                    );
-                  }}
-                />
-
                 {touched[key] && errors[key] && (
-                  <Text style={s.error}>
-                    ⚠ {errors[key]}
-                  </Text>
+                  <Text style={s.error}>⚠ {errors[key]}</Text>
                 )}
               </View>
             )
@@ -278,69 +258,45 @@ export default function OnboardingScreen({
           {/* Weight & Height */}
           <View style={s.row}>
             <View style={[s.card, { flex: 1 }]}>
-              <View style={s.labelRow}>
-                <Weight
-                  size={18}
-                  color={colors.green}
-                />
-
-                <Text style={s.label}>
-                  Peso
-                </Text>
+              <View style={s.inputWrapper}>
+                <Weight size={20} color={colors.green} style={s.icon} />
+                <View style={s.inputContent}>
+                  <Text style={s.label}>Peso</Text>
+                  <TextInput
+                    style={s.input}
+                    placeholder="70"
+                    placeholderTextColor={colors.muted}
+                    keyboardType="numeric"
+                    value={weight}
+                    onChangeText={setWeight}
+                  />
+                  <Text style={s.unit}>kg</Text>
+                </View>
               </View>
-
-              <TextInput
-                style={s.input}
-                placeholder="70"
-                placeholderTextColor={
-                  colors.muted
-                }
-                keyboardType="numeric"
-                value={weight}
-                onChangeText={setWeight}
-              />
-
-              <Text style={s.unit}>kg</Text>
-
-              {touched.weight &&
-                errors.weight && (
-                  <Text style={s.error}>
-                    ⚠ {errors.weight}
-                  </Text>
-                )}
+              {touched.weight && errors.weight && (
+                <Text style={s.error}>⚠ {errors.weight}</Text>
+              )}
             </View>
 
             <View style={[s.card, { flex: 1 }]}>
-              <View style={s.labelRow}>
-                <Ruler
-                  size={18}
-                  color={colors.green}
-                />
-
-                <Text style={s.label}>
-                  Altura
-                </Text>
+              <View style={s.inputWrapper}>
+                <Ruler size={20} color={colors.green} style={s.icon} />
+                <View style={s.inputContent}>
+                  <Text style={s.label}>Altura</Text>
+                  <TextInput
+                    style={s.input}
+                    placeholder="175"
+                    placeholderTextColor={colors.muted}
+                    keyboardType="numeric"
+                    value={height}
+                    onChangeText={setHeight}
+                  />
+                  <Text style={s.unit}>cm</Text>
+                </View>
               </View>
-
-              <TextInput
-                style={s.input}
-                placeholder="175"
-                placeholderTextColor={
-                  colors.muted
-                }
-                keyboardType="numeric"
-                value={height}
-                onChangeText={setHeight}
-              />
-
-              <Text style={s.unit}>cm</Text>
-
-              {touched.height &&
-                errors.height && (
-                  <Text style={s.error}>
-                    ⚠ {errors.height}
-                  </Text>
-                )}
+              {touched.height && errors.height && (
+                <Text style={s.error}>⚠ {errors.height}</Text>
+              )}
             </View>
           </View>
 
@@ -496,23 +452,32 @@ const s = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)',
   },
 
-  labelRow: {
+  inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 12,
+    alignItems: 'flex-start',
+  },
+
+  icon: {
+    marginRight: 12,
+    marginTop: 2,
+  },
+
+  inputContent: {
+    flex: 1,
   },
 
   label: {
     color: colors.muted,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
+    marginBottom: 4,
   },
 
   input: {
     color: colors.white,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
+    padding: 0,
   },
 
   row: {
@@ -522,9 +487,9 @@ const s = StyleSheet.create({
 
   unit: {
     color: colors.green,
-    marginTop: 10,
-    fontWeight: '700',
-    fontSize: 13,
+    marginTop: 6,
+    fontWeight: '600',
+    fontSize: 12,
   },
 
   error: {

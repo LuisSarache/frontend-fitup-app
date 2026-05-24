@@ -19,6 +19,10 @@ export default function WorkoutSelectionScreen({ navigation, route }: Props) {
   const levelLabel =
     level === 'Beginner' ? 'Iniciante' : level === 'Intermediate' ? 'Intermediário' : 'Avançado';
 
+  const handleSkip = () => {
+    navigation.replace('MainTabs', { screen: 'Home' });
+  };
+
   return (
     <LinearGradient colors={['#0A0A0A', '#111827', '#0A0A0A']} style={s.container}>
       <ScrollView
@@ -68,6 +72,17 @@ export default function WorkoutSelectionScreen({ navigation, route }: Props) {
             </LinearGradient>
           </TouchableOpacity>
         ))}
+
+        {/* SKIP BUTTON */}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={handleSkip}
+          style={s.skipButton}
+        >
+          <Text style={s.skipText}>
+            Pular e ir para Home
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
     </LinearGradient>
   );
@@ -136,5 +151,20 @@ const s = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 14,
+  },
+  skipButton: {
+    marginHorizontal: 24,
+    marginTop: 8,
+    paddingVertical: 16,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center',
+  },
+  skipText: {
+    color: colors.muted,
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

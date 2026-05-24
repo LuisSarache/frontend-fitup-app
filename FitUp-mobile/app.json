@@ -4,10 +4,10 @@
     "slug": "fitup",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/fitup-logo.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/fitup-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#0A0F1E"
     },
@@ -21,7 +21,7 @@
     "android": {
     "googleServicesFile": "./google-services.json",
     "adaptiveIcon": {
-      "foregroundImage": "./assets/adaptive-icon.png",
+      "foregroundImage": "./assets/fitup-logo.png",
       "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
@@ -31,7 +31,7 @@
       }
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/fitup-logo.png",
       "bundler": "metro"
     },
     "extra": {

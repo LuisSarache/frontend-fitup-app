@@ -130,15 +130,7 @@ export default function LevelSelectionScreen({
               accessibilityRole="button"
               accessibilityLabel={`${label}: ${desc}`}
             >
-              <LinearGradient
-                colors={[
-                  'rgba(255,255,255,0.05)',
-                  'rgba(255,255,255,0.02)',
-                ]}
-                style={
-                  s.cardGradient
-                }
-              >
+              <View style={s.cardContent}>
                 <View
                   style={s.emojiWrapper}
                 >
@@ -180,7 +172,7 @@ export default function LevelSelectionScreen({
                     →
                   </Text>
                 </View>
-              </LinearGradient>
+              </View>
             </TouchableOpacity>
           )
         )}
@@ -255,36 +247,18 @@ const s = StyleSheet.create({
 
   card: {
     marginHorizontal: 24,
-
     borderRadius: 28,
-
     overflow: 'hidden',
-
     marginBottom: 18,
-
-    shadowColor: '#22C55E',
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
-
-    elevation: 8,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
 
-  cardGradient: {
+  cardContent: {
     flexDirection: 'row',
-
     alignItems: 'center',
-
     padding: 22,
-
-    borderWidth: 1,
-
-    borderColor:
-      'rgba(255,255,255,0.06)',
-
-    borderRadius: 28,
-
-    backgroundColor:
-      'rgba(255,255,255,0.03)',
   },
 
   emojiWrapper: {
