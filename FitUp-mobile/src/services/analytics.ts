@@ -11,12 +11,17 @@ function sanitize(params?: AnalyticsEventParams): AnalyticsEventParams | undefin
 }
 
 function reportError(action: string, error: unknown): void {
-  if (__DEV__) console.warn(`[Analytics] Failed to ${action}`, error);
+  if (__DEV__) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    const sanitizedMsg = errorMsg.replace(/[\r\n]/g, ' ');
+    console.warn(`[Analytics] Failed to ${action}`, sanitizedMsg);
+  }
 }
 
 function logEvent(name: string, params?: AnalyticsEventParams): void {
   const safeParams = sanitize(params);
-  if (__DEV__) console.log(`[Analytics] ${name}`, safeParams);
+  const sanitizedName = name.replace(/[\r\n]/g, ' ');
+  if (__DEV__) console.log(`[Analytics] ${sanitizedName}`, safeParams);
 
   getFirebaseAnalytics()
     ?.logEvent(name, safeParams)

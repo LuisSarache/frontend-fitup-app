@@ -12,7 +12,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CommonActions } from '@react-navigation/native';
 import { MainTabParamList, RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';
@@ -114,10 +115,12 @@ export default function ProfileScreen({ navigation }: Props) {
         style: 'destructive',
         onPress: async () => {
           await logout();
-          navigation.getParent<NativeStackNavigationProp<RootStackParamList>>()?.reset({
-            index: 0,
-            routes: [{ name: 'Login' }],
-          });
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: 'Login' }],
+            })
+          );
         },
       },
     ]);

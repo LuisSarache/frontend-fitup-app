@@ -67,17 +67,4 @@ const s = StyleSheet.create({
     letterSpacing: 2,
     textAlign: 'center',
   },
-  loadingContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 32,
-    justifyContent: 'center',
-  },
-  loadingDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.green,
-    opacity: 0.6,
-  },
 });

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -39,36 +40,36 @@ export default function App() {
       <AppProvider>
         <ToastProvider>
           <NavigationContainer
-          ref={navRef}
-          onReady={() => {
-            routeNameRef.current = navRef.current?.getCurrentRoute()?.name;
-            if (routeNameRef.current) Analytics.screenViewed(routeNameRef.current);
-          }}
-          onStateChange={() => {
-            const previousRouteName = routeNameRef.current;
-            const currentRouteName = navRef.current?.getCurrentRoute()?.name;
+            ref={navRef}
+            onReady={() => {
+              routeNameRef.current = navRef.current?.getCurrentRoute()?.name;
+              if (routeNameRef.current) Analytics.screenViewed(routeNameRef.current);
+            }}
+            onStateChange={() => {
+              const previousRouteName = routeNameRef.current;
+              const currentRouteName = navRef.current?.getCurrentRoute()?.name;
 
-            if (currentRouteName && previousRouteName !== currentRouteName) {
-              routeNameRef.current = currentRouteName;
-              Analytics.screenViewed(currentRouteName);
-            }
-          }}
-        >
-          <StatusBar style="light" />
-          <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
-            <Stack.Screen name="Splash" component={SplashScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="SignUp" component={SignUpScreen} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-            <Stack.Screen name="MainTabs" component={AppTabs} />
-            <Stack.Screen name="Onboarding" component={OnboardingScreen} />
-            <Stack.Screen name="LevelSelection" component={LevelSelectionScreen} />
-            <Stack.Screen name="WorkoutSelection" component={WorkoutSelectionScreen} />
-            <Stack.Screen name="Workout" component={WorkoutScreenComponent} />
-            <Stack.Screen name="Completion" component={CompletionScreen} />
-            <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
+              if (currentRouteName && previousRouteName !== currentRouteName) {
+                routeNameRef.current = currentRouteName;
+                Analytics.screenViewed(currentRouteName);
+              }
+            }}
+          >
+            <StatusBar style="light" />
+            <Stack.Navigator screenOptions={{ headerShown: false, animation: 'slide_from_right' }}>
+              <Stack.Screen name="Splash" component={SplashScreen} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="SignUp" component={SignUpScreen} />
+              <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+              <Stack.Screen name="MainTabs" component={AppTabs} />
+              <Stack.Screen name="Onboarding" component={OnboardingScreen} />
+              <Stack.Screen name="LevelSelection" component={LevelSelectionScreen} />
+              <Stack.Screen name="WorkoutSelection" component={WorkoutSelectionScreen} />
+              <Stack.Screen name="Workout" component={WorkoutScreenComponent} />
+              <Stack.Screen name="Completion" component={CompletionScreen} />
+              <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
+            </Stack.Navigator>
+          </NavigationContainer>
         </ToastProvider>
       </AppProvider>
     </SafeAreaProvider>

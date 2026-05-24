@@ -1,39 +1,15 @@
 import React from 'react';
-
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { CompositeScreenProps } from '@react-navigation/native';
-
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-import {
-  MainTabParamList,
-  RootStackParamList,
-} from '../navigation/types';
-
+import { MainTabParamList, RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
-
 import { getNextWorkout } from '../data/workouts';
-
-import {
-  getWeekActivity,
-  getRelativeDate,
-  formatDuration,
-} from '../utils/history';
-
-import { colors } from '../theme';
+import { getWeekActivity, getRelativeDate, formatDuration } from '../utils/history';
+import { colors, font } from '../theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<
@@ -43,66 +19,28 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-const WEEK_LABELS = [
-  'D',
-  'S',
-  'T',
-  'Q',
-  'Q',
-  'S',
-  'S',
-];
+const WEEK_LABELS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
 
-export default function HomeScreen({
-  navigation,
-}: Props) {
-  const {
-    profile,
-    streak,
-    history,
-    achievements,
-  } = useApp();
-
+export default function HomeScreen({ navigation }: Props) {
+  const { profile, streak, history, achievements } = useApp();
   const insets = useSafeAreaInsets();
-
-  const level =
-    profile?.level ?? 'Beginner';
-
-  const nextWorkout = getNextWorkout(
-    history,
-    level
-  );
-
-  const weekActivity =
-    getWeekActivity(history);
-
-  const recent = [...history]
-    .reverse()
-    .slice(0, 3);
+  const level = profile?.level ?? 'Beginner';
+  const nextWorkout = getNextWorkout(history, level);
+  const weekActivity = getWeekActivity(history);
+  const recent = [...history].reverse().slice(0, 3);
 
   const greeting = () => {
     const h = new Date().getHours();
-
     if (h < 12) return 'Bom dia';
-
     if (h < 18) return 'Boa tarde';
-
     return 'Boa noite';
   };
 
   return (
-    <LinearGradient
-      colors={['#0A0A0A', '#111827', '#0A0A0A']}
-      style={s.container}
-    >
+    <View style={s.container}>
       <ScrollView
-        showsVerticalScrollIndicator={
-          false
-        }
-        contentContainerStyle={{
-          paddingBottom:
-            insets.bottom + 40,
-        }}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: insets.bottom + 40 }}
       >
         {/* HEADER */}
         <View
@@ -414,13 +352,14 @@ export default function HomeScreen({
           </>
         )}
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const s = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.bg,
   },
 
   header: {

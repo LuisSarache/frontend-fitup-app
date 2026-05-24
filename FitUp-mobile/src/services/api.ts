@@ -29,7 +29,8 @@ api.interceptors.response.use(
     // Log network errors
     if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
       const networkError = handleNetworkError(error);
-      console.warn('[Network Error]', networkError.message);
+      const sanitizedMessage = networkError.message.replace(/[\r\n]/g, ' ');
+      console.warn('[Network Error]', sanitizedMessage);
     }
 
     const originalRequest = error.config;
