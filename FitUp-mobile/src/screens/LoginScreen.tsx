@@ -83,6 +83,9 @@ export default function LoginScreen({
         password
       );
 
+      console.log('[Login] Token received:', token ? 'Yes' : 'No');
+      console.log('[Login] useMock:', env.useMock);
+
       await setToken(token);
 
       Analytics.login('email');
@@ -91,19 +94,27 @@ export default function LoginScreen({
       let hasProfile = !!profile;
 
       if (!env.useMock) {
+        console.log('[Login] Fetching profile from API...');
         try {
           const { data } =
             await api.get<UserProfile>(
               '/profile'
             );
 
+          console.log('[Login] Profile received:', data);
           await setProfile(data);
 
           hasProfile = true;
-        } catch {
+        } catch (err) {
+          console.error('[Login] Failed to fetch profile:', err);
           hasProfile = false;
         }
+      } else {
+        console.log('[Login] Mock mode - checking local profile');
+        hasProfile = !!profile;
       }
+
+      console.log('[Login] Has profile:', hasProfile);
 
       if (hasProfile) {
         navigation.replace('MainTabs', {

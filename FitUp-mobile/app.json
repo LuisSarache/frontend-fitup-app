@@ -8,7 +8,7 @@
     "userInterfaceStyle": "dark",
     "splash": {
       "image": "./assets/fitup-logo.png",
-      "resizeMode": "contain",
+      "resizeMode": "cover",
       "backgroundColor": "#0A0F1E"
     },
     "assetBundlePatterns": [
@@ -19,10 +19,10 @@
       "bundleIdentifier": "com.fitup.app"
     },
     "android": {
-    "googleServicesFile": "./google-services.json",
-    "adaptiveIcon": {
-      "foregroundImage": "./assets/fitup-logo.png",
-      "backgroundColor": "#0A0F1E"
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/fitup-logo.png",
+        "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
       "softwareKeyboardLayoutMode": "resize",
@@ -35,8 +35,10 @@
       "bundler": "metro"
     },
     "extra": {
+      "EXPO_PUBLIC_USE_MOCK": "true",
+      "EXPO_PUBLIC_API_URL": "https://backend-fitup.onrender.com",
       "eas": {
-        "projectId": "8a720819-eb47-467d-9661-fa2ac35c7fa1"
+        "projectId": "ff7fda5a-79c7-49db-be39-ae18e608eb7f"
       }
     }
   }
