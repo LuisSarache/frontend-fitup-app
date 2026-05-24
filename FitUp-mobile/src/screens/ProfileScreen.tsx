@@ -15,6 +15,7 @@ import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MainTabParamList, RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
+import { useToast } from '../context/ToastContext';
 import {
   calculateBMI,
   getBMICategory,
@@ -38,6 +39,7 @@ type Props = CompositeScreenProps<
 
 export default function ProfileScreen({ navigation }: Props) {
   const { profile, logout, setProfile } = useApp();
+  const toast = useToast();
   const insets = useSafeAreaInsets();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile?.name ?? '');
@@ -72,11 +74,12 @@ export default function ProfileScreen({ navigation }: Props) {
     const w = parseFloat(weight.replace(',', '.'));
     const h = parseInt(height, 10);
     if (!name.trim() || isNaN(w) || isNaN(h)) {
-      Alert.alert('Dados inválidos', 'Verifique os campos antes de salvar.');
+      toast.error('Dados inválidos. Verifique os campos antes de salvar.');
       return;
     }
     await setProfile({ ...profile, name: name.trim(), weightKg: w, heightCm: h, avatar: selectedEmoji });
     setEditing(false);
+    toast.success('Perfil atualizado com sucesso!');
   };
 
   const handleNotifToggle = async (val: boolean) => {

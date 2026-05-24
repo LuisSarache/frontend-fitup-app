@@ -6,6 +6,7 @@ import * as Haptics from 'expo-haptics';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
+import { useToast } from '../context/ToastContext';
 import { formatDuration } from '../utils/history';
 import { colors, font } from '../theme';
 
@@ -14,6 +15,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Completion'>;
 export default function CompletionScreen({ navigation, route }: Props) {
   const { workoutKey, workoutLabel, durationSeconds, exercisesTotal } = route.params;
   const { addWorkoutEntry, streak, profile } = useApp();
+  const toast = useToast();
   const insets = useSafeAreaInsets();
   const savedRef = useRef(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -26,6 +28,7 @@ export default function CompletionScreen({ navigation, route }: Props) {
     savedRef.current = true;
     addWorkoutEntry(workoutKey, workoutLabel, durationSeconds, exercisesTotal);
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    toast.success('🏆 Treino completado com sucesso!');
     
     Animated.parallel([
       Animated.spring(scaleAnim, {
@@ -47,7 +50,10 @@ export default function CompletionScreen({ navigation, route }: Props) {
       await Share.share({
         message: `🏆 Acabei de completar o ${workoutLabel}!\n⏱️ ${formatDuration(durationSeconds)}\n💪 ${exercisesTotal} exercícios\n🔥 Streak: ${streak.current} dias\n\nTreine comigo no FitUp!`,
       });
-    } catch {}
+      toast.success('Compartilhado com sucesso!');
+    } catch {
+      toast.error('Não foi possível compartilhar');
+    }
   };
 
   return (

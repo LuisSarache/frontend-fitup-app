@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { load, save, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
+import { handleNetworkError } from '../utils/networkError';
 import { getApiBaseUrl } from '../config/env';
 
 const api = axios.create({
@@ -25,6 +26,12 @@ let refreshQueue: Array<(token: string) => void> = [];
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Log network errors
+    if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      const networkError = handleNetworkError(error);
+      console.warn('[Network Error]', networkError.message);
+    }
+
     const originalRequest = error.config;
     if (error?.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

@@ -7,6 +7,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { Platform } from 'react-native';
 
 import { AppProvider } from './src/context/AppContext';
+import { ToastProvider } from './src/context/ToastContext';
 import { RootStackParamList } from './src/navigation/types';
 import AppTabs from './src/navigation/AppTabs';
 import { setUnauthorizedHandler } from './src/services/api';
@@ -46,6 +47,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppProvider>
+        <ToastProvider>
         <NavigationContainer
           ref={navRef}
           onReady={() => {
@@ -77,6 +79,7 @@ export default function App() {
             <Stack.Screen name="ChangeLevel" component={ChangeLevelScreen} />
           </Stack.Navigator>
         </NavigationContainer>
+        </ToastProvider>
       </AppProvider>
     </SafeAreaProvider>
   );

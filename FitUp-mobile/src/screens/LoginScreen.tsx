@@ -26,6 +26,7 @@ import {
 import { RootStackParamList } from '../navigation/types';
 
 import { useApp } from '../context/AppContext';
+import { useToast } from '../context/ToastContext';
 
 import { authService } from '../services/auth';
 import api from '../services/api';
@@ -52,6 +53,7 @@ export default function LoginScreen({
 }: Props) {
   const { profile, setToken, setProfile } =
     useApp();
+  const toast = useToast();
 
   const insets = useSafeAreaInsets();
 
@@ -68,7 +70,7 @@ export default function LoginScreen({
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      setError('Preencha e-mail e senha.');
+      toast.error('Preencha e-mail e senha.');
       return;
     }
 
@@ -84,6 +86,7 @@ export default function LoginScreen({
       await setToken(token);
 
       Analytics.login('email');
+      toast.success('Login realizado com sucesso!');
 
       let hasProfile = !!profile;
 
@@ -110,7 +113,9 @@ export default function LoginScreen({
         navigation.replace('Onboarding');
       }
     } catch (err) {
-      setError(parseApiError(err));
+      const errorMsg = parseApiError(err);
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

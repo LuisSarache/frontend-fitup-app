@@ -14,8 +14,8 @@ export default function SplashScreen({ navigation }: Props) {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(opacity, { toValue: 1, duration: 600, useNativeDriver: true }),
-      Animated.spring(scale, { toValue: 1, friction: 6, useNativeDriver: true }),
+      Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
+      Animated.spring(scale, { toValue: 1, friction: 5, tension: 40, useNativeDriver: true }),
     ]).start();
   }, [opacity, scale]);
 
@@ -32,10 +32,17 @@ export default function SplashScreen({ navigation }: Props) {
   return (
     <View style={s.container}>
       <Animated.View style={{ opacity, transform: [{ scale }] }}>
-        <Text style={s.logo}>
-          Fit<Text style={{ color: colors.green }}>Up</Text>
-        </Text>
+        <View style={s.logoContainer}>
+          <Text style={s.logo}>
+            Fit<Text style={{ color: colors.green }}>Up</Text>
+          </Text>
+        </View>
         <Text style={s.tagline}>Train. Evolve. Repeat.</Text>
+        <View style={s.loadingContainer}>
+          <View style={s.loadingDot} />
+          <View style={[s.loadingDot, { animationDelay: '0.2s' }]} />
+          <View style={[s.loadingDot, { animationDelay: '0.4s' }]} />
+        </View>
       </Animated.View>
     </View>
   );
@@ -48,11 +55,14 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  logoContainer: {
+    marginBottom: 16,
+  },
   logo: {
-    fontSize: 64,
+    fontSize: 72,
     fontWeight: '900',
     color: colors.white,
-    lineHeight: 68,
+    lineHeight: 76,
     textAlign: 'center',
   },
   tagline: {
@@ -61,5 +71,18 @@ const s = StyleSheet.create({
     color: colors.muted,
     letterSpacing: 2,
     textAlign: 'center',
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 32,
+    justifyContent: 'center',
+  },
+  loadingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.green,
+    opacity: 0.6,
   },
 });
