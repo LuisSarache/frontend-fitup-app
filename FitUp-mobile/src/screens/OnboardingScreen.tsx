@@ -54,6 +54,7 @@ type Props = NativeStackScreenProps<
 
 export default function OnboardingScreen({
   navigation,
+  route,
 }: Props) {
   const { setProfile, profile } = useApp();
 
@@ -121,7 +122,7 @@ export default function OnboardingScreen({
 
     const profileData: UserProfile = {
       name: name.trim(),
-      email: profile?.email ?? '',
+      email: profile?.email ?? route.params?.email ?? '',
       weightKg: parseFloat(weight.replace(',', '.')),
       heightCm: parseInt(height, 10),
       dateOfBirth: dobISO,

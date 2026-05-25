@@ -91,7 +91,9 @@ export default function SignUpScreen({
 
       Analytics.signUp('email');
 
-      navigation.replace('Onboarding');
+      navigation.replace('Onboarding', {
+        email: email.trim(),
+      });
     } catch (err) {
       setError(parseApiError(err));
     } finally {

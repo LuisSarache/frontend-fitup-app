@@ -17,7 +17,7 @@ export type MainTabParamList = {
 
 export type AppStackParamList = {
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  Onboarding: undefined;
+  Onboarding: { email?: string } | undefined;
   LevelSelection: undefined;
   ChangeLevel: undefined;
   WorkoutSelection: { level: WorkoutLevel };
