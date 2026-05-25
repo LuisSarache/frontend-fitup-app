@@ -168,10 +168,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    console.log('[AppContext] Starting logout...');
     try {
       await authService.logout();
-      console.log('[AppContext] authService.logout() completed');
     } catch (err) {
       console.error('[AppContext] Error during authService.logout():', err);
     }
@@ -181,8 +179,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setStreakState(getDefaultStreak());
     setHistoryState([]);
     setAchievementsState([]);
-
-    console.log('[AppContext] Logout completed successfully');
   }, []);
 
   return (

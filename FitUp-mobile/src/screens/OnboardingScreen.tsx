@@ -29,6 +29,7 @@ import {
 
 import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
+import { UserProfile } from '../types';
 
 import {
   validateAll,
@@ -119,7 +120,7 @@ export default function OnboardingScreen({
         ? '23-25'
         : '25+';
 
-    const profileData = {
+    const profileData: UserProfile = {
       name: name.trim(),
       email: profile?.email ?? '',
       weightKg: parseFloat(weight.replace(',', '.')),
