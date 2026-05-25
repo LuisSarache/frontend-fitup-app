@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Award, ChartNoAxesColumnIncreasing, Home, UserRound } from 'lucide-react-native';
@@ -29,7 +29,8 @@ const LABELS: Record<keyof MainTabParamList, string> = {
 
 export default function AppTabs() {
   const insets = useSafeAreaInsets();
-  const bottomPadding = insets.bottom > 0 ? insets.bottom : 10;
+  const bottomPadding = Platform.OS === 'android' ? Math.max(insets.bottom, 24) : insets.bottom;
+  const tabBarHeight = 64 + bottomPadding;
 
   return (
     <Tab.Navigator
@@ -39,9 +40,10 @@ export default function AppTabs() {
         tabBarInactiveTintColor: colors.muted,
         tabBarLabel: LABELS[route.name],
         tabBarLabelStyle: s.label,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
           ...s.tabBar,
-          minHeight: 72 + insets.bottom,
+          height: tabBarHeight,
           paddingBottom: bottomPadding,
         },
         tabBarItemStyle: s.item,

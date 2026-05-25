@@ -40,6 +40,16 @@ module.exports = ({ config: expoConfig }) => {
     ...(baseConfig.plugins ?? []),
     'expo-font',
     [
+      'expo-navigation-bar',
+      {
+        position: 'relative',
+        behavior: 'inset-touch',
+        visibility: 'visible',
+        backgroundColor: '#0A0F1E',
+        barStyle: 'light',
+      },
+    ],
+    [
       'expo-build-properties',
       {
         ios: {

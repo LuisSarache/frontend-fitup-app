@@ -35,6 +35,9 @@ export default function App() {
 
     // Configurar navigation bar no Android
     if (Platform.OS === 'android') {
+      NavigationBar.setVisibilityAsync('visible');
+      NavigationBar.setPositionAsync('relative');
+      NavigationBar.setBehaviorAsync('inset-touch');
       NavigationBar.setBackgroundColorAsync('#0A0F1E');
       NavigationBar.setButtonStyleAsync('light');
     }
