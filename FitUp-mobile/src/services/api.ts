@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { load, save, remove, KEYS } from '../storage/storage';
 import { withRetry } from '../utils/apiErrors';
 import { handleNetworkError } from '../utils/networkError';
@@ -27,7 +27,7 @@ export function setUnauthorizedHandler(handler: () => void) {
 }
 
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+let refreshQueue: ((token: string) => void)[] = [];
 
 api.interceptors.response.use(
   (response) => response,

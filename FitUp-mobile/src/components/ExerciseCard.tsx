@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { X, Info, Clock, Zap } from 'lucide-react-native';
 import { Exercise } from '../data/workouts';
-import { colors, font } from '../theme';
+import { colors } from '../theme';
 
 type Props = {
   exercise: Exercise;

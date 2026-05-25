@@ -8,7 +8,7 @@ import { RootStackParamList } from '../navigation/types';
 import { ErrorMessage } from '../components/ErrorMessage';
 import BackButton from '../components/BackButton';
 import { Button } from '../components/ui';
-import { colors, font } from '../theme';
+import { colors } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPassword'>;
 

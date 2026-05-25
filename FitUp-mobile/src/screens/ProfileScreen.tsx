@@ -10,10 +10,9 @@ import {
   Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CompositeScreenProps } from '@react-navigation/native';
+import { CommonActions, CompositeScreenProps } from '@react-navigation/native';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { CommonActions } from '@react-navigation/native';
 import { MainTabParamList, RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { useToast } from '../context/ToastContext';

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import { Text, StyleSheet, Animated, Dimensions } from 'react-native';
 import { CheckCircle, XCircle, AlertCircle, Info } from 'lucide-react-native';
 import { colors } from '../theme';
 

@@ -20,8 +20,6 @@ import { useApp } from '../context/AppContext';
 
 import { Analytics } from '../services/analytics';
 
-import { colors } from '../theme';
-
 import BackButton from '../components/BackButton';
 import api from '../services/api';
 import { env } from '../config/env';

@@ -23,7 +23,6 @@ import { UserProfile } from '../types';
 import { parseApiError } from '../utils/apiErrors';
 import { Analytics } from '../services/analytics';
 import { ErrorMessage } from '../components/ErrorMessage';
-import { Button, TextField } from '../components/ui';
 import { colors, font } from '../theme';
 
 type Props = NativeStackScreenProps<

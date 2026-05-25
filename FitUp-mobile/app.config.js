@@ -38,6 +38,7 @@ module.exports = ({ config: expoConfig }) => {
   const iosBundleIdentifier = process.env.EXPO_PUBLIC_IOS_BUNDLE_ID ?? readIosBundleId();
   const plugins = [
     ...(baseConfig.plugins ?? []),
+    'expo-font',
     [
       'expo-build-properties',
       {

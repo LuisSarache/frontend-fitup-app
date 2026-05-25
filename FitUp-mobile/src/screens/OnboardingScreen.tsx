@@ -19,7 +19,6 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import {
   User,
-  Mail,
   Weight,
   Ruler,
   CalendarDays,
@@ -44,7 +43,7 @@ import {
 
 import { Analytics } from '../services/analytics';
 import { calculateAge } from '../utils/health';
-import { colors, font } from '../theme';
+import { colors } from '../theme';
 import api from '../services/api';
 import { env } from '../config/env';
 

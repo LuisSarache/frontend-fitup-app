@@ -9,7 +9,7 @@ import { MainTabParamList, RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { getNextWorkout } from '../data/workouts';
 import { getWeekActivity, getRelativeDate, formatDuration } from '../utils/history';
-import { colors, font } from '../theme';
+import { colors } from '../theme';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<

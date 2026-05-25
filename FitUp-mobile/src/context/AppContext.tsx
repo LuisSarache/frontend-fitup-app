@@ -40,10 +40,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const [p, t, analyticsEnabled] = await Promise.all([
+        const [p, t] = await Promise.all([
           load<UserProfile>(KEYS.profile),
           load<string>(KEYS.token),
-          load<boolean>(KEYS.analyticsEnabled),
         ]);
 
         if (p) setProfileState(p);
@@ -66,7 +65,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               if (streakRes?.data) setStreakState(streakRes.data);
               if (historyRes?.data) setHistoryState(historyRes.data);
               if (achievementsRes?.data) setAchievementsState(achievementsRes.data);
-            } catch (error) {
+            } catch {
               console.warn('[AppContext] Failed to load from API, using local data');
               try {
                 const [s, h, a] = await Promise.all([
