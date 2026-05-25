@@ -6,11 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/fitup-app-icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/fitup-splash.png",
-      "resizeMode": "cover",
-      "backgroundColor": "#0A0F1E"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],

@@ -29,6 +29,8 @@ import {
   requestNotificationPermissions,
 } from '../services/notifications';
 import { Analytics } from '../services/analytics';
+import api from '../services/api';
+import { env } from '../config/env';
 import { save, load, KEYS } from '../storage/storage';
 import { colors, font } from '../theme';
 
@@ -77,9 +79,26 @@ export default function ProfileScreen({ navigation }: Props) {
       toast.error('Dados inválidos. Verifique os campos antes de salvar.');
       return;
     }
-    await setProfile({ ...profile, name: name.trim(), weightKg: w, heightCm: h, avatar: selectedEmoji });
-    setEditing(false);
-    toast.success('Perfil atualizado com sucesso!');
+    const updatedProfile = {
+      ...profile,
+      name: name.trim(),
+      weightKg: w,
+      heightCm: h,
+      avatar: selectedEmoji,
+    };
+
+    try {
+      if (!env.useMock) {
+        await api.put('/profile', updatedProfile);
+      }
+
+      await setProfile(updatedProfile);
+      setEditing(false);
+      toast.success('Perfil atualizado com sucesso!');
+    } catch (err) {
+      console.error('[Profile] Failed to sync profile:', err);
+      toast.error('Nao foi possivel salvar o perfil. Tente novamente.');
+    }
   };
 
   const handleNotifToggle = async (val: boolean) => {

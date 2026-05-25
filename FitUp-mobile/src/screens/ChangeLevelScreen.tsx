@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { Alert, View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -8,6 +8,8 @@ import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { WorkoutLevel } from '../types';
 import BackButton from '../components/BackButton';
+import api from '../services/api';
+import { env } from '../config/env';
 import { colors } from '../theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ChangeLevel'>;
@@ -33,8 +35,17 @@ export default function ChangeLevelScreen({ navigation }: Props) {
       navigation.goBack();
       return;
     }
-    await setLevel(key);
-    navigation.goBack();
+    try {
+      if (!env.useMock) {
+        await api.put('/profile/level', { level: key });
+      }
+
+      await setLevel(key);
+      navigation.goBack();
+    } catch (err) {
+      console.error('[ChangeLevel] Failed to sync level:', err);
+      Alert.alert('Erro', 'Nao foi possivel salvar o nivel. Tente novamente.');
+    }
   };
 
   return (
