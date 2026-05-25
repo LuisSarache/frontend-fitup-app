@@ -47,10 +47,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         ]);
 
         if (p) setProfileState(p);
-        
+
         if (t) {
           setTokenState(t);
-          
+
           if (!env.useMock) {
             try {
               const [profileRes, streakRes, historyRes, achievementsRes] = await Promise.all([
@@ -68,6 +68,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               if (achievementsRes?.data) setAchievementsState(achievementsRes.data);
             } catch (error) {
               console.warn('[AppContext] Failed to load from API, using local data');
+              try {
+                const [s, h, a] = await Promise.all([
+                  load<StreakData>(KEYS.streak),
+                  load<WorkoutEntry[]>(KEYS.history),
+                  load<Achievement[]>('@fitup:achievements'),
+                ]);
+                if (s) setStreakState(s);
+                if (h) setHistoryState(h);
+                if (a) setAchievementsState(a);
+              } catch (localError) {
+                console.warn('[AppContext] Failed to load local data:', localError);
+              }
+            }
+          } else {
+            try {
               const [s, h, a] = await Promise.all([
                 load<StreakData>(KEYS.streak),
                 load<WorkoutEntry[]>(KEYS.history),
@@ -76,20 +91,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               if (s) setStreakState(s);
               if (h) setHistoryState(h);
               if (a) setAchievementsState(a);
+            } catch (localError) {
+              console.warn('[AppContext] Failed to load local data in mock mode:', localError);
             }
-          } else {
-            const [s, h, a] = await Promise.all([
-              load<StreakData>(KEYS.streak),
-              load<WorkoutEntry[]>(KEYS.history),
-              load<Achievement[]>('@fitup:achievements'),
-            ]);
-            if (s) setStreakState(s);
-            if (h) setHistoryState(h);
-            if (a) setAchievementsState(a);
           }
         }
       } catch (error) {
-        console.error('[AppContext] Error:', error);
+        console.error('[AppContext] Error during initialization:', error);
       } finally {
         setIsLoading(false);
       }
@@ -160,9 +168,21 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    await authService.logout();
+    console.log('[AppContext] Starting logout...');
+    try {
+      await authService.logout();
+      console.log('[AppContext] authService.logout() completed');
+    } catch (err) {
+      console.error('[AppContext] Error during authService.logout():', err);
+    }
+
     setProfileState(null);
     setTokenState(null);
+    setStreakState(getDefaultStreak());
+    setHistoryState([]);
+    setAchievementsState([]);
+
+    console.log('[AppContext] Logout completed successfully');
   }, []);
 
   return (
