@@ -10,7 +10,6 @@ import { colors } from '../theme';
 import BackButton from '../components/BackButton';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'WorkoutSelection'>;
-
 export default function WorkoutSelectionScreen({ navigation, route }: Props) {
   const { level } = route.params;
   const insets = useSafeAreaInsets();

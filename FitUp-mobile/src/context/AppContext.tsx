@@ -40,19 +40,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const [p, t, s, h, a] = await Promise.all([
+        const [p, t, analyticsEnabled] = await Promise.all([
           load<UserProfile>(KEYS.profile),
           load<string>(KEYS.token),
-          load<StreakData>(KEYS.streak),
-          load<WorkoutEntry[]>(KEYS.history),
-          load<Achievement[]>('@fitup:achievements'),
+          load<boolean>(KEYS.analyticsEnabled),
         ]);
 
         if (p) setProfileState(p);
+        
         if (t) {
           setTokenState(t);
           
-          // Se não estiver em modo mock, busca dados do backend
           if (!env.useMock) {
             try {
               const [profileRes, streakRes, historyRes, achievementsRes] = await Promise.all([
@@ -70,12 +68,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               if (achievementsRes?.data) setAchievementsState(achievementsRes.data);
             } catch (error) {
               console.warn('[AppContext] Failed to load from API, using local data');
+              const [s, h, a] = await Promise.all([
+                load<StreakData>(KEYS.streak),
+                load<WorkoutEntry[]>(KEYS.history),
+                load<Achievement[]>('@fitup:achievements'),
+              ]);
+              if (s) setStreakState(s);
+              if (h) setHistoryState(h);
+              if (a) setAchievementsState(a);
             }
+          } else {
+            const [s, h, a] = await Promise.all([
+              load<StreakData>(KEYS.streak),
+              load<WorkoutEntry[]>(KEYS.history),
+              load<Achievement[]>('@fitup:achievements'),
+            ]);
+            if (s) setStreakState(s);
+            if (h) setHistoryState(h);
+            if (a) setAchievementsState(a);
           }
         }
-        if (s) setStreakState(s);
-        if (h) setHistoryState(h);
-        if (a) setAchievementsState(a);
       } catch (error) {
         console.error('[AppContext] Error:', error);
       } finally {

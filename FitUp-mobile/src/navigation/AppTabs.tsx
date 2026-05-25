@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Award, ChartNoAxesColumnIncreasing, Home, UserRound } from 'lucide-react-native';
 import { MainTabParamList } from './types';
 import { colors } from '../theme';
@@ -27,6 +28,9 @@ const LABELS: Record<keyof MainTabParamList, string> = {
 };
 
 export default function AppTabs() {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = insets.bottom > 0 ? insets.bottom : 10;
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -35,7 +39,11 @@ export default function AppTabs() {
         tabBarInactiveTintColor: colors.muted,
         tabBarLabel: LABELS[route.name],
         tabBarLabelStyle: s.label,
-        tabBarStyle: s.tabBar,
+        tabBarStyle: {
+          ...s.tabBar,
+          minHeight: 72 + insets.bottom,
+          paddingBottom: bottomPadding,
+        },
         tabBarItemStyle: s.item,
         tabBarIcon: ({ color, size, focused }) => {
           const Icon = ICONS[route.name];
@@ -59,9 +67,7 @@ export default function AppTabs() {
 
 const s = StyleSheet.create({
   tabBar: {
-    minHeight: 72,
     paddingTop: 8,
-    paddingBottom: 10,
     backgroundColor: colors.card,
     borderTopColor: colors.border,
     borderTopWidth: 1,
@@ -74,6 +80,5 @@ const s = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
     marginTop: 2,
-    fontFamily: undefined,
   },
 });

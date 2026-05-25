@@ -54,17 +54,18 @@ const s = StyleSheet.create({
     marginBottom: 16,
   },
   logo: {
-    fontSize: 72,
+    fontSize: 96,
     fontWeight: '900',
     color: colors.white,
-    lineHeight: 76,
+    lineHeight: 100,
     textAlign: 'center',
   },
   tagline: {
-    marginTop: 12,
-    fontSize: font.md,
+    marginTop: 16,
+    fontSize: font.lg,
     color: colors.muted,
-    letterSpacing: 2,
+    letterSpacing: 3,
     textAlign: 'center',
+    fontWeight: '600',
   },
 });
