@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,37 +9,21 @@ import {
   View,
   TextInput,
 } from 'react-native';
-
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { Mail, Lock, ArrowRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-
-import {
-  Mail,
-  Lock,
-  ArrowRight,
-} from 'lucide-react-native';
-
+import { useToast } from '../hooks/useToast';
 import { RootStackParamList } from '../navigation/types';
-
 import { useApp } from '../context/AppContext';
-import { useToast } from '../context/ToastContext';
-
 import { authService } from '../services/auth';
 import api from '../services/api';
-
 import { env } from '../config/env';
-
 import { UserProfile } from '../types';
-
 import { parseApiError } from '../utils/apiErrors';
-
 import { Analytics } from '../services/analytics';
-
 import { ErrorMessage } from '../components/ErrorMessage';
-
+import { Button, TextField } from '../components/ui';
 import { colors, font } from '../theme';
 
 type Props = NativeStackScreenProps<
