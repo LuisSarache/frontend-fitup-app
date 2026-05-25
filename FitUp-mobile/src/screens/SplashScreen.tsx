@@ -37,7 +37,7 @@ export default function SplashScreen({ navigation }: Props) {
             Fit<Text style={{ color: colors.green }}>Up</Text>
           </Text>
         </View>
-        <Text style={s.tagline}>Train. Evolve. Repeat.</Text>
+        <Text style={s.tagline}>Treine. Evolua. Repita.</Text>
       </Animated.View>
     </View>
   );
