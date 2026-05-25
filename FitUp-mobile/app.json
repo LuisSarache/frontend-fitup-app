@@ -6,9 +6,12 @@
     "orientation": "portrait",
     "icon": "./assets/fitup-app-icon.png",
     "userInterfaceStyle": "dark",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "splash": {
+      "image": "./assets/fitup-app-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0A0F1E"
+    },
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.fitup.app"
@@ -17,6 +20,11 @@
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/fitup-app-icon.png",
+        "backgroundColor": "#0A0F1E"
+      },
+      "splash": {
+        "image": "./assets/fitup-app-icon.png",
+        "resizeMode": "contain",
         "backgroundColor": "#0A0F1E"
       },
       "package": "com.fitup.app",
