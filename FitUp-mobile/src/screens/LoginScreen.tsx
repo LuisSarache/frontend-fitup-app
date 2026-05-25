@@ -10,6 +10,7 @@ import {
   TextInput,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { isAxiosError } from 'axios';
 import { Mail, Lock, ArrowRight } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -60,8 +61,9 @@ export default function LoginScreen({
     setError(null);
 
     try {
+      const loginEmail = email.trim();
       const token = await authService.login(
-        email.trim(),
+        loginEmail,
         password
       );
 
@@ -84,7 +86,12 @@ export default function LoginScreen({
           hasProfile = true;
         } catch (err) {
           console.error('[Login] Failed to fetch profile:', err);
-          hasProfile = false;
+
+          if (isAxiosError(err) && err.response?.status === 404) {
+            hasProfile = false;
+          } else {
+            throw err;
+          }
         }
       } else {
         hasProfile = !!profile;
@@ -96,7 +103,7 @@ export default function LoginScreen({
         });
       } else {
         navigation.replace('Onboarding', {
-          email: email.trim(),
+          email: loginEmail,
         });
       }
     } catch (err) {

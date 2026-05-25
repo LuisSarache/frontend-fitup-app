@@ -29,6 +29,7 @@ import {
 import { RootStackParamList } from '../navigation/types';
 import { useApp } from '../context/AppContext';
 import { UserProfile } from '../types';
+import { ErrorMessage } from '../components/ErrorMessage';
 
 import {
   validateAll,
@@ -68,6 +69,8 @@ export default function OnboardingScreen({
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const touch = (field: string) =>
     setTouched((prev) => ({
@@ -84,6 +87,7 @@ export default function OnboardingScreen({
     );
 
     setErrors(errs);
+    setApiError(null);
 
     setTouched({
       name: true,
@@ -130,15 +134,22 @@ export default function OnboardingScreen({
       level: 'Beginner',
     };
 
-    await setProfile(profileData);
+    setSubmitting(true);
 
-    if (!env.useMock) {
-      try {
+    try {
+      if (!env.useMock) {
         await api.put('/profile', profileData);
-      } catch (err) {
-        console.error('[Onboarding] Failed to sync profile:', err);
       }
+
+      await setProfile(profileData);
+    } catch (err) {
+      console.error('[Onboarding] Failed to sync profile:', err);
+      setApiError('Nao foi possivel salvar seu perfil. Verifique sua conexao e tente novamente.');
+      setSubmitting(false);
+      return;
     }
+
+    setSubmitting(false);
 
     Analytics.onboardingCompleted(ageGroup);
 
@@ -385,10 +396,13 @@ export default function OnboardingScreen({
           </View>
 
           {/* CTA */}
+          {apiError && <ErrorMessage message={apiError} />}
+
           <TouchableOpacity
             activeOpacity={0.9}
             style={s.button}
             onPress={handleContinue}
+            disabled={submitting}
           >
             <LinearGradient
               colors={[
@@ -398,7 +412,7 @@ export default function OnboardingScreen({
               style={s.buttonGradient}
             >
               <Text style={s.buttonText}>
-                Continuar →
+                {submitting ? 'Salvando...' : 'Continuar →'}
               </Text>
             </LinearGradient>
           </TouchableOpacity>
