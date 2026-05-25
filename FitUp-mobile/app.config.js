@@ -55,7 +55,7 @@ module.exports = ({ config: expoConfig }) => {
     plugins,
     extra: {
       ...baseConfig.extra,
-      EXPO_PUBLIC_USE_MOCK: process.env.EXPO_PUBLIC_USE_MOCK || 'true',
+      EXPO_PUBLIC_USE_MOCK: process.env.EXPO_PUBLIC_USE_MOCK || 'false',
       EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL || 'https://backend-fitup.onrender.com',
     },
     ios: {

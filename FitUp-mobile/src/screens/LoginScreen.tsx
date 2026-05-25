@@ -95,7 +95,9 @@ export default function LoginScreen({
           screen: 'Home',
         });
       } else {
-        navigation.replace('Onboarding');
+        navigation.replace('Onboarding', {
+          email: email.trim(),
+        });
       }
     } catch (err) {
       const errorMsg = parseApiError(err);
