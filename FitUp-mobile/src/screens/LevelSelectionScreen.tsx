@@ -23,6 +23,8 @@ import { Analytics } from '../services/analytics';
 import { colors } from '../theme';
 
 import BackButton from '../components/BackButton';
+import api from '../services/api';
+import { env } from '../config/env';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -66,6 +68,14 @@ export default function LevelSelectionScreen({
     Analytics.levelSelected(key);
 
     await setLevel(key);
+
+    if (!env.useMock) {
+      try {
+        await api.put('/profile/level', { level: key });
+      } catch (err) {
+        console.error('[LevelSelection] Failed to sync level:', err);
+      }
+    }
 
     navigation.navigate(
       'WorkoutSelection',

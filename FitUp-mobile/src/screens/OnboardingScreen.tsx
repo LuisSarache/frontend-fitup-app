@@ -44,6 +44,8 @@ import {
 import { Analytics } from '../services/analytics';
 import { calculateAge } from '../utils/health';
 import { colors, font } from '../theme';
+import api from '../services/api';
+import { env } from '../config/env';
 
 type Props = NativeStackScreenProps<
   RootStackParamList,
@@ -117,7 +119,7 @@ export default function OnboardingScreen({
         ? '23-25'
         : '25+';
 
-    await setProfile({
+    const profileData = {
       name: name.trim(),
       email: profile?.email ?? '',
       weightKg: parseFloat(weight.replace(',', '.')),
@@ -125,7 +127,17 @@ export default function OnboardingScreen({
       dateOfBirth: dobISO,
       sex,
       level: 'Beginner',
-    });
+    };
+
+    await setProfile(profileData);
+
+    if (!env.useMock) {
+      try {
+        await api.put('/profile', profileData);
+      } catch (err) {
+        console.error('[Onboarding] Failed to sync profile:', err);
+      }
+    }
 
     Analytics.onboardingCompleted(ageGroup);
 
